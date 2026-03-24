@@ -1,0 +1,52 @@
+VTOCLS(1)                      ZOAU Command Syntax                     VTOCLS(1)
+
+NAME
+
+	vtocls - List the contents of the VTOC for a given volume.
+
+SYNOPSIS
+
+	vtocls [-dhuv] <volume> [<dataset>]*
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-u
+		Include last reference (usage) time in output.
+		Unreferenced datasets listed as January 1st, Year 0.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	vtocls lists the volume table of contents (VTOC) for a given volume,
+	filtering by an optional list of datasets.
+
+	Note: If a filter dataset is not in the volume, a message
+	will be printed and all subsequent filters will be ignored.
+
+EXAMPLES
+
+	List the contents of volume USER10:
+
+		vtocls USER10
+
+	List the contents of volume USER10, restricted to two datasets,
+	and include the last reference time (usage) in the output:
+
+		vtocls -u USER10 ibmuser.user.jcl ibmuser.user.cobol
+
+EXIT VALUES
+
+	0
+		At least one dataset was found matching a dataset-pattern
+
+	1
+		No datasets were found.
+
+	other
+		Error in dataset listing. See error messages for details.

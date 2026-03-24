@@ -1,0 +1,305 @@
+DTOUCH(1)                    ZOAU Command Syntax                  DTOUCH(1)
+
+NAME
+
+	dtouch - Create an empty dataset or generation data group (GDG).
+
+SYNOPSIS
+
+	dtouch [-adhjJuv] [OPTIONS] <DATASET>
+	dtouch [-dEPSvXY] [OPTIONS] -t GDG -L <GDG_LIMIT> <GDG_NAME>
+
+	OPTIONS:
+		[-c <STORAGE_CLASS>]
+		[-C <AVERAGE_BLOCK_LENGTH>]
+		[-D <DATA_CLASS>]
+		[-e <SECONDARY_SPACE>]
+		[-F <SPACE_FORMAT>]
+		[-k <KEY_LENGTH:KEY_OFFSET>]
+		[-l <LOGICAL_RECORD_LENGTH>]
+		[-m <MANAGEMENT_CLASS>]
+		[-r <RECORD_FORMAT>]
+		[-s <PRIMARY_SPACE>]
+		[-t <DATASET_TYPE>]
+		[-V <VOLUMES>]
+
+	-a
+		Verbose allocation output.
+		The -a option is ignored if JSON output is enabled with -j or -J.
+
+	-b <DIRECTORY_BLOCKS>
+		This is the number of directory blocks for a partitioned dataset
+		(PDS).
+		Optional parameter for PDS datasets. Default is 5.
+
+	-B <BLOCK_SIZE>
+		This is the block size of the dataset. The default sizes are:
+		- 80 for record format F.
+		- 32718 for FBA.
+		- 32720 for FB and FBS.
+		- 32743 for VBA.
+		- 32760 for VB and VBS.
+		- 0 for U.
+
+		In JSON output mode, the block size can have a value of 0 when it
+		is determined by the record format and length.
+
+	-c <STORAGE_CLASS>
+		This is the storage class for an SMS-managed dataset.
+		Required for SMS-managed datasets that do not match an SMS-rule.
+		Not valid for datasets that are not SMS-managed.
+		Note that all non-linear VSAM datasets are SMS-managed.
+
+	-C <AVERAGE_BLOCK_LENGTH>
+		<AVERAGE_BLOCK_LENGTH> specifies the average data block length, in bytes,
+		the system will use when computing the amount of space to allocate.
+		This option must be combined with the -s and -e options to specify
+		the primary and secondary space quantities followed by the BLK suffix.
+
+	-d
+		Print debug messages.
+
+	-D <DATA_CLASS>
+		<DATA_CLASS> is the data class name for an SMS-managed dataset.
+		Optional for SMS-managed datasets that do not match an SMS-rule.
+		Not valid for datasets that are not SMS-managed.
+		Note that all non-linear VSAM datasets are SMS-managed.
+
+	-e <SECONDARY_SPACE>
+		Use <SECONDARY_SPACE> to define the amount of secondary space for
+		dataset allocation. This is the size of the extents. Defaults to
+		1/10 of <PRIMARY_SPACE>.
+
+		The size value may include one of the following suffixes:
+		- K or KB (kilobytes)
+		- M or MB (megabytes)
+		- G or GB (gigabytes)
+		- C or CYL (cylinders)
+		- T or TRK (tracks)
+		- BLK (blocks)
+
+		If no suffix is added, the size is calculated as bytes.
+		When using bytes, KB, MB, or GB units, the number of tracks to
+		allocate is rounded up, which can produce a small difference in the
+		expected dataset size.
+		When using BLK units, the average data block length must be specified.
+
+	-E
+		Sets the EMPTY attribute for generation data groups.
+		If this option is omitted, the GDG is created with the NONEMPTY
+		attribute.
+
+	-F <SPACE_FORMAT>
+		This is the format of allocated space to use when allocating the
+		dataset. It may be one of:
+
+		- ALX - Different areas of contiguous space are to be allocated.
+		- CONTIG - Space must be contiguous.
+		- MXIG - Maximum contiguous space is required.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print JSON output. The following attributes are only in the output
+		if they were explicitly defined by their command line option:
+
+		- Data class        (-D)
+		- Management class  (-m)
+		- Storage class     (-c)
+		- Volumes           (-V)
+
+	The value for primary and secondary space is the number of tracks
+	allocated, regardless of the unit used for -s or -e.
+	For example, -s15M will show '"primary": 265'.
+
+	-J
+		Print JSON output in a readable format.
+
+	-k <KEY_LENGTH>:<KEY_OFFSET>
+		Required for Key Sequenced Datasets (KSDS)
+
+	-l <LOGICAL_RECORD_LENGTH>
+		This is expressed in bytes. The default lengths are:
+		- 80 for fixed datasets (F, FB, FBS).
+		- 133 for format FBA.
+		- 137 for variable datasets (VB, VBA, VBS).
+		- 0 for unformatted datasets (U).
+
+		For variable datasets, the length must include the 4-byte prefix
+		area.
+
+	-L <GDG_LIMIT>
+		This defines the maximum number of generations in a GDG.
+		Required for generation data groups.
+
+	-m <MANAGEMENT_CLASS>
+		This is the management class for an SMS-managed dataset. Optional
+		for SMS-managed datasets that do not match an SMS-rule. Not valid
+		for datasets that are not SMS-managed.
+		Note that all non-linear VSAM datasets are SMS-managed.
+
+	-P
+		Sets the PURGE attribute for generation data groups.
+		If this option is omitted, the GDG is created with the NOPURGE
+		attribute.
+
+	-r <RECORD_FORMAT>
+		This is the record format that is used when creating the dataset.
+		It is one of F, FB, VB, FBA, VBA, U, FBS, VBS.
+		The default is FB.
+
+	-s <PRIMARY_SPACE>
+		Use <PRIMARY_SPACE> to specify the primary space allocation for the
+		dataset. The default value is 100 tracks.
+
+		The size value may include one of the following suffixes:
+		- K or KB (kilobytes)
+		- M or MB (megabytes)
+		- G or GB (gigabytes)
+		- C or CYL (cylinders)
+		- T or TRK (tracks)
+		- BLK (blocks)
+
+		If no suffix is added, the size is calculated as bytes.
+		When using bytes, KB, MB, or GB units, the number of tracks to
+		allocate is rounded up, which can produce a small difference in the
+		expected dataset size.
+		When using BLK units, the average block length must be specified.
+
+	-S
+		Sets the SCRATCH attribute for generation data groups.
+		If this option is omitted, the GDG is created with the NOSCRATCH
+		attribute.
+
+	-t <DATASET_TYPE>
+		This may be one of the following:
+		ESDS, GDG, HFS, KSDS, LARGE, LDS, LIBRARY, PDS, PDSE, SEQ.
+
+		The default type is PDSE. LIBRARY is a synonym for PDSE.
+
+	-u <DEVICE_UNIT>
+		Unit name of the device that the dataset will reside on.
+		Specifies a device group esoteric name, a generic device type, or a
+		specific device number. If you target a specific device number, you
+		must precede the device address with a slash (/) character.
+
+	-v
+		Verbose name output.
+
+	-V <VOLUMES>
+		Use <VOLUMES> to specify a list of volumes for dataset allocation.
+		It must be a list of comma-separated volume serials. When providing
+		multiple volumes, processing will begin with the first volume in
+		the provided list. Offline volumes are not considered.
+
+		Volumes can always be provided when not using SMS. When using SMS,
+		volumes can be provided when the storage class being used has
+		GUARANTEED_SPACE=YES specified. Otherwise the allocation will fail.
+
+	-X
+		Sets the EXTENDED attribute for generation data groups.
+		If this option is omitted, the GDG is created with the NOEXTENDED
+		attribute.
+
+	-Y
+		Sets the FIFO attribute for generation data groups.
+		If this option is omitted, the GDG is created with the LIFO
+		attribute.
+
+	<DATASET>
+		Name of the dataset to allocate.
+
+	<GDG_NAME>
+		Name of the generation data group to allocate.
+
+DESCRIPTION
+
+	dtouch allocates a generation data group (GDG), partitioned dataset
+	(PDS),partitioned dataset extended (PDSE), sequential dataset, or
+	VSAM dataset.
+	dtouch is similar to the touch command, but it creates datasets instead
+	of zFS files.
+
+UNIT CONVERSIONS
+
+	dtouch uses the following values when converting between different unit
+	types:
+
+	- 1 KB = 1024 bytes
+	- 1 MB = 1024 KB
+	- 1 GB = 1024 MB
+	- 1 track = 56664 bytes
+	- 1 cylinder = 15 tracks
+
+EXAMPLES
+
+	Allocate an FB 80 PDSE with a primary size of 5M named IBMUSER.DATASET:
+
+		dtouch ibmuser.dataset
+
+	Allocate an FB 80 sequential dataset with a primary size of 5M
+	named TSTRADM.MY.TEXT:
+
+		dtouch -tseq tstradm.my.seq
+
+	Allocate an FB 80 sequential dataset with a primary size of 5M
+	named TSTRADM.MY.TEXT on volumes 000000, VOL002, and VOL003:
+
+		dtouch -tseq -V000000,vol002,vol003 tstradm.my.seq
+
+	Allocate a VSAM KSDS file with a 3 byte primary key starting in
+	column 4 named IBMUSER.DATA.FILE in data class MYDATA:
+
+		dtouch -tksds -k3:4 -cmydata ibmuser.data.file
+
+	Allocate a VB 136 PDS with a primary size of 400K called
+	IBMUSER.MY.LISTING (this file will have 132 characters of text per
+	record):
+
+		dtouch -tpds -rvb -l136 -s400k ibmuser.my.listing
+
+	Define a generation data group named `IBMUSER.MY.GDG` with a limit of
+	255 generations:
+
+		dtouch -tgdg -L255 ibmuser.my.gdg
+
+	Allocate a sequential dataset named IBMUSER.MY.DATA to the specific
+	device number 2E17.
+
+		dtouch -tseq -u/2E17 ibmuser.my.data
+
+	Allocate a sequential dataset in storage class STORCLS and get JSON
+	output:
+
+		dtouch -J -tseq -c STORCLS IBMUSER.SEQ.DATA
+
+		Output:
+			{
+				"data": {
+						"dsname": "IBMUSER.SEQ.DATA",
+						"storclass": "STORCLS",
+						"dsorg": "PS",
+						"recfm": "FB",
+						"dsntype": "BASIC",
+						"primary": 100,
+						"secondary": 100,
+						"lrecl": 80,
+						"blksize": 0,
+				},
+				"program": "dtouch",
+				"options": "-J -t seq -c STORCLS ",
+				"rc": "0"
+			}
+
+EXIT VALUES
+
+	0
+		dtouch completed without error.
+
+	non-zero
+		Errors occurred. See error messages for details.
+
+SEE ALSO
+
+	dls(1) touch(1)

@@ -1,0 +1,113 @@
+MVSTMP(1)                      ZOAU Command Syntax                     MVSTMP(1)
+
+NAME
+
+	mvstmp - Generate a valid MVS dataset name suitable for use as a
+	temporary dataset.
+
+SYNOPSIS
+
+	mvstmp [-cdhv] [PREFIX]
+
+	-c
+		Runs a test to verify if the current user is able to write to a
+		temporary dataset using the provided or default PREFIX.
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Generate a name suitable for use as a z/OS dataset name and write
+	the name to stdout. No dataset is actually created - this utility
+	just generates a name.
+
+	If the PREFIX argument or TMPHLQ environment variables are used, the
+	value provided must adhere to the following rules:
+
+	* It must be a maximum of 17 characters long.
+	* It must follow z/OS dataset naming rules.
+	* It may contain 0 or more periods. For example the following prefixes
+	  are valid: ZOAU, ZOAU.PREFIX, ZOAU.PREFIX.NAME
+
+	The generated name is of the format:
+		<PREFIX>.<PROCESS>.<TIMESTAMP>.<COUNTER>
+
+	The name components are as follows:
+
+	<PREFIX>
+		Defaults to the current user ID if no prefix is specified.
+		Overrides TMPHLQ environment variable if provided.
+		Prefix must conform to MVS dataset naming conventions.
+
+	<PROCESS>
+		'P' followed by the low order 7 digits of the process ID
+		of the mvstmp process.
+
+	<TIMESTAMP>
+		'T' followed by the low order 7 digits of the microseconds
+		component of the current time of day.
+
+	<COUNTER>
+		'C' followed by 7 zeros.
+
+	For example:
+
+		PREFIX00.Pnnnnnnn.Tnnnnnnn.C0000000
+
+ENVIRONMENT VARIABLES
+
+	TMPHLQ
+		Set the value used as PREFIX in the temporary dataset name.
+
+EXAMPLES
+
+	Generate a temporary dataset name with a high-level qualifier (HLQ) of TEST:
+
+		mvstmp TEST
+
+	Generate a temporary dataset name with a high-level qualifier of ZOAU.PREFIX
+
+		mvstmp ZOAU.PREFIX
+
+	Generate a temporary dataset name with a high-level qualifier of ZOAU,
+	while using the environment variable TMPHLQ:
+
+		export TMPHLQ="ZOAU"; mvstmp
+
+	Check if the current user ID is able to write to the high-level qualifier
+	ZOAUTEST:
+
+		mvstmp -c ZOAUTEST
+
+EXIT VALUES
+
+	0
+		mvstmp completed without error.
+
+	1
+		The environment variable __POSIX_TMPNAM could not be set to "NO".
+
+	2
+		Syntax error.  Correct the mvstmp invocation and rerun the command.
+
+	3
+		Invalid PREFIX value. Ensure that the dataset name prefix conforms to
+		the rules specified in the DESCRIPTION section of this page.
+
+	4
+		Write test failed. mvstmp was unable to perform a test write to the
+		generated dataset name. Correct the PREFIX value or contact your system
+		programmer to adjust the permissions of the invoking user ID.
+
+	5
+		PREFIX is too long.  Reduce the length of the prefix string.
+
+	non-zero
+		mvstmp failed. See error messages for details.

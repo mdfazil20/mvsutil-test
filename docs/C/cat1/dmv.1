@@ -1,0 +1,46 @@
+DMV(1)                         ZOAU Command Syntax                        DMV(1)
+
+NAME
+
+	dmv - Move a partitioned dataset, sequential dataset, or generation
+	data group to a new name.
+
+SYNOPSIS
+
+	dmv [-dhv] SOURCE TARGET
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	The dmv command renames the dataset SOURCE to the name TARGET. dmv renames
+	non-VSAM datasets and generation data groups. It does not rename partitioned
+	dataset members. Use the mmv command to rename a partitioned dataset member.
+
+	When a generation data group (GDG) is specified as the source, the base and
+	all of its active generations are renamed. dmv can only move a GDG located
+	on disk. dmv cannot rename GDGs when rolled-off generation datasets exist.
+
+	dmv supports the generation dataset relative name notation.
+
+	dmv does not support moving datasets located on tape.
+
+EXAMPLES
+
+EXIT VALUES
+
+	0
+		dmv completed successfully.
+
+	other
+		An error occurred. See error messages for details.
+
+SEE ALSO
+	mv(1), mmv(1), dcp(1)

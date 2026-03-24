@@ -1,0 +1,35 @@
+LLWHENCE(1)                    ZOAU Command Syntax                   LLWHENCE(1)
+
+NAME
+
+	llwhence - Find the dataset in the linklist that a module comes from.
+
+SYNOPSIS
+
+	llwhence [-dhv] <MODULE_NAME>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Search the linklist for a specified load module, and display the dataset
+	it comes from.
+
+EXAMPLES
+
+	llwhence adm8501
+
+EXIT VALUES
+
+	0
+		llwhence completed successfully.
+
+	Other
+		Error, see message for details.

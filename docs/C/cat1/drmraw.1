@@ -1,0 +1,52 @@
+DRMRAW(1)                      ZOAU Command Syntax                     DRMRAW(1)
+
+NAME
+
+	drmraw - Remove one or more VSAM cluster or non-VSAM datasets.
+
+SYNOPSIS
+	drmraw [-dfhv] [<dataset>]+
+
+	-d
+		Print out debug messages.
+
+	-f
+		If the dataset does not exist, do not issue a message.
+
+	-h
+		Display syntax help.
+
+	-v
+		Issue a message for each deleted dataset.
+
+DESCRIPTION
+
+	drmraw removes the specified VSAM clusters or non-VSAM datasets.
+	No wildcards are expected in dataset names. Use the drm command
+	to work with dataset patterns.
+
+EXAMPLES
+
+	Delete the dataset IBMUSER.PROJ22.JCL and the dataset IBMUSER.PROJ23.JCL
+
+		drmraw 'ibmuser.proj22.jcl' 'ibmuser.proj23.jcl'
+
+	Delete datasets TESTER01.PROJ23.TEXT and TESTER02.PROJ23.JCL.
+	Print a message for each dataset deleted. If the datasets do not exist,
+	do not print an error message
+
+		drmraw -vf tester01.proj23.text tester02.proj23.jcl
+
+EXIT VALUES
+
+	0
+		drmraw completed without error.
+
+	1
+		Dataset specified by dataset pattern does not exist.
+
+	non-zero
+		Errors occurred. See error messages for details.
+
+SEE ALSO
+	drm(1), rm(1), dls(1)

@@ -1,0 +1,165 @@
+PCON(1)                        ZOAU Command Syntax                       PCON(1)
+
+NAME
+
+	pcon - Print the contents of the syslog in a given timeframe.
+
+SYNOPSIS
+
+	pcon [-hjJv] [-S <SYSTEM NAME>* | -A] <TIME FRAME>
+
+		Where <TIME FRAME> is one of:
+			[-adlmrwy*]			 Short options for relative timeframes
+			-t <MINUTES>		 Other specific relative timeframe
+			-s <yyddd hh:mm:ss>	 Specific system time
+
+	-A, --allsys
+		Print syslog records from all systems.
+
+	-a, -*, --all
+		Print the entire log.
+
+	-d, --day
+		Print the previous 24 hours of the log.
+
+	--debug
+		Print debug information.
+
+	-h, --help
+		Print syntax help.
+
+	-j, --json
+		Print output in JSON format with this structure:
+		{
+			"data": {
+				"SYSTEM_A": {
+					"content": "...",
+					"content_length": 0
+				},
+				"SYSTEM_B": {...},
+			},
+			"program": "pcon",
+			"options": "-j ",
+			"rc": "0"
+		}
+
+		If the log is empty for the time frame requested, the value for
+		"content" is a single space " " and "content_length" is 0.
+
+	-J, --prettyjson
+		Print JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-l, --hour
+		Print the previous 60 minutes of the log.
+
+	-m, --month
+		Print the previous 30 days of the log.
+
+	-r, --recent
+		Print the previous 10 minutes of the log.
+
+	-s, --since
+		Print the log from a given Julian date (yyddd) and
+		time (hh:mm:ss). If the seconds are omitted, 00 is the default.
+
+	-S, --system
+		Print syslog from the specified system name.
+		A comma-separated list of system names can be passed to print records
+		from multiple systems, or '*' for all systems in a sysplex.
+
+	-t, --timediff
+		Print the log from a specified number of minutes ago.
+		For example, to print the log from 45 minutes ago up to the present,
+		enter 'pcon -t 45'. To print from 5.5 hours ago to the present, enter
+		'pcon -t 330'.
+
+	-v, --verbose
+		Print verbose information.
+
+	-w, --week
+		Print the previous 7 days of the log.
+
+	-y, --year
+		Print the previous 365 days of the log.
+
+DESCRIPTION
+
+	pcon prints the syslog. The prior 10 minutes of the log are printed by
+	default. The following options can be specified:
+
+	* A particular date and time.
+
+	* A relative duration.
+
+	* The entire log.
+
+	To specify a particular date, you must use the Julian date format, which is the
+	day-of-year number. For example, to specify a date of February 15, use
+	day-of-year number "046".
+
+	The output format is described in the z/OS documentation for
+	"HCL Programming Interface Information"
+	(https://www.ibm.com/docs/en/zos/latest?topic=iar-hcl-information)
+	and "SYSLOG records"
+	(https://www.ibm.com/docs/en/zos/latest?topic=automation-syslog-records).
+
+NOTES
+
+	pcon is incompatible with OPERLOG. For pcon to display console messages, set
+	the z/OS console hardcopy medium to SYSLOG.
+
+	To determine the hardcopy medium on a system, issue the following z/OS
+	console command:
+
+		DISPLAY CONSOLES,HARDCOPY
+
+	If the response message CNZ4100I contains "LOG=(OPERLOG)", pcon does
+	not function correctly on this system. If the response is "LOG=(SYSLOG)",
+	"LOG=(SYSLOG,OPERLOG)", or similar, pcon displays the syslog output.
+
+	For more information, see "z/OS MVS System Messages, Vol 4 (CBD-DMO)"
+	(https://www.ibm.com/docs/en/zos/latest?topic=messages-cnz4100i)
+	and "z/OS MVS System Commands"
+	(https://www.ibm.com/docs/en/zos/latest?topic=command-displaying-console-status-information-consoles)
+
+	All relevant records from each syslog are printed at a time, so chronology
+	between messages from different systems is lost. The order of the system
+	names in the -S option is not maintained in the output.
+	The order corresponds to the ID of each SYSLOG job in ascending order.
+
+EXAMPLES
+
+	Print the entire log:
+
+		pcon -a
+
+	Print the last hour of the log:
+
+		pcon -l
+
+	Print the last two minutes of the log. This can be useful for
+	systems with large amounts of log activity.
+
+		pcon -t 2
+
+	Print the log from 22:17:33 on 03/23/21. This is the 82nd day
+	of 2021:
+
+		pcon -s 21082 22:17:33
+
+EXIT VALUES
+
+	0
+		pcon completed successfully.
+
+	2
+		Syntax error. Correct the pcon syntax and resubmit the command.
+
+	4
+		An invalid argument was specified. Examine the error message,
+		correct the argument, and resubmit the command.
+
+	8
+		An error occurred when the log information was retrieved.
+		Examine the error message for details.

@@ -1,0 +1,58 @@
+PROCGREP(1)                    ZOAU Command Syntax                   PROCGREP(1)
+
+NAME
+	procgrep - Search for a string across the proclib concatenation.
+
+SYNOPSIS
+
+	procgrep [-dhinv] <str> <dataset-pattern>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-i
+		Ignore case.
+
+	-n
+		Display line numbers.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Search for a string across the proclib concatenation.
+
+DATASET PATTERNS
+
+	The following rules apply to <dataset-pattern>:
+
+	The high-level qualifier (HLQ) must be specified in full.
+	An asterisk (*) matches any sequence of characters.
+	A question mark (?) matches a single character.
+
+EXAMPLES
+
+	Search for rdtd (case sensitive) across the proclib concatenation.
+
+		procgrep rdtd
+
+	Search for Hello (case insensitive) across the proclib concatenation,
+	displaying line numbers.
+
+		procgrep -in Hello
+
+EXIT VALUES
+
+	0
+		Success
+
+	Other
+		Error, see message for details
+
+SEE ALSO
+
+	parmgrep(1)

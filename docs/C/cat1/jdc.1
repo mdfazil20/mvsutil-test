@@ -1,0 +1,30 @@
+JDC(1)                         ZOAU Command Syntax                        JDC(1)
+
+NAME
+
+    jdc - Julian date converter.
+
+SYNOPSIS
+
+    jdc [-h] [JULIAN-DATE]
+
+    -h
+		Display syntax help.
+
+DESCRIPTION
+
+    Converts a julian date to a human-readable, sortable date in the
+    format yyyy/mm/dd.
+
+    JULIAN-DATE must be in one of the following formats:
+    yyyy.ddd, yy.ddd, yyyyddd, or yyddd
+
+    When JULIAN-DATE is omitted, jdc returns today's date.
+
+EXIT VALUES
+
+    0
+        Success
+
+    non-zero
+        Error converting date. See error messages for details.

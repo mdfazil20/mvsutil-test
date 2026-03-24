@@ -1,0 +1,77 @@
+E2A(1)                         ZOAU Command Syntax                        E2A(1)
+
+NAME
+
+	e2a - Convert file from EBCDIC to ASCII.
+
+SYNOPSIS
+
+	e2a [-dFhqv] [-f <source_codepage>] [-t <dest_codepage>] <FILE>
+
+	-d
+		Print out debug messages.
+
+	-F
+		Force conversion regardless of file tag.
+
+	-f <source_codepage>
+		Specify the current code page. Default is IBM-1047.
+
+	-h
+		Display syntax help.
+
+	-q
+		Quiet mode. Do not display warning messages.
+
+	-t <target_codepage>
+		Specify the target code page. Default is ISO8859-1.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	e2a converts and tags a file on disk from an EBCDIC code page to an ASCII
+	one. This command preserves file tags, permissions, and timestamps.
+
+	The command issues an error message if the file is already tagged as
+	the target code page.
+
+	The command issues a warning message when an untagged file is converted.
+	If a warning message appears, verify that the reencoding was performed
+	correctly.
+
+	When using -f or -t, specify the code page name. Numeric code page
+	identifiers are not supported.
+
+EXAMPLES
+
+	Convert a file that is tagged as IBM-1047 to ISO8859-1:
+
+		e2a /home/myfile
+
+	Convert a file that is tagged as IBM-037 to ISO8859-2:
+
+		e2a -f IBM-037 -t ISO8859-2 /home/myfile
+
+	Force the conversion of a file that is tagged as binary:
+
+		e2a -F /home/mybinaryfile
+
+EXIT VALUES
+
+	0
+		Conversion was successful.
+
+	2
+		An untagged file was converted.
+
+	4
+		Invalid syntax.
+
+	8
+		Error converting the file.
+
+SEE ALSO
+
+	a2e(1)

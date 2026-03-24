@@ -1,0 +1,69 @@
+DLSRAW(1)                      ZOAU Command Syntax                     DLSRAW(1)
+
+NAME
+
+	dlsraw - List datasets and their corresponding type, matching the given pattern.
+
+SYNOPSIS
+
+	dlsraw [-dhv] <dataset-pattern>
+
+	-h
+		Print this syntax message.
+
+	-d
+		Print debug information.
+
+	-v
+		Print verbose information.
+
+DESCRIPTION
+
+	dlsraw lists datasets that match a pattern to stdout. Each entry is
+	of the form:
+		<type> <name> <volume>
+
+	Where <type> indicates the type of dataset being listed, and volume
+	is the volume the dataset resides on (if the dataset is on multiple
+	volumes, the volume displayed will be the first volume).
+	<type> may be:
+		CATALOG:   the dataset is a catalog
+		PAGESPACE: the dataset is a pagespace
+		NONVSAM:   the dataset is sequential or partitioned
+		CLUSTER:   the dataset is a VSAM cluster
+		DATA:      the dataset is a VSAM DATA dataset
+		INDEX:     the dataset is a VSAM INDEX dataset
+		ALIAS:     the dataset is an alias of another dataset
+		GDGBASER:  the dataset is a GDG base dataset
+		AIX:       the dataset is an AIX dataset
+
+	Note: If the dataset has been migrated, the volume shown will be MIGRAT
+	and should be filtered on by higher level tools to prevent dataset
+	recall (unless that is the desired outcome).
+
+EXAMPLES
+
+	List all datasets that start with IBMUSER.MVSCMD:
+		dlsraw 'IBMUSER.MVSCMD.*'
+
+	List all datasets that start with IBMUSER.MVS*:
+		dlsraw 'ibmuser.mvs*.*'
+
+	List all datasets that have a high-level qualifier (HLQ) of TEST and a
+	low level qualifier of JCL:
+		dlsraw 'test.*.jcl'
+
+EXIT VALUES
+
+	0
+		At least one dataset was found matching a dataset-pattern.
+
+	1
+		No datasets were found.
+
+	other
+		Error in dataset listing. See error messages for details.
+
+SEE ALSO
+
+	dls(1), mls(1)

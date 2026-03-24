@@ -1,0 +1,46 @@
+HLQ(1)                         ZOAU Command Syntax                        HLQ(1)
+
+NAME
+
+	hlq - Print out the current TSO high-level qualifier.
+
+SYNOPSIS
+
+	hlq [-dhv]
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Write the high-level qualifier (HLQ) associated with the active TSO profile.
+	This is very useful for creating fully qualified datasets from
+	relative datasets (this is analagous to the 'home' directory in the
+	hierarchical file system used by Unix System Services).
+
+EXAMPLES
+
+	Obtain the high-level qualifier and use it to build a fully qualified
+	dataset pattern for use by dls to list all the datasets I have
+	under my TSO ID with a low level qualifier of JCL:
+	
+		dls "$(hlq).*.JCL"
+
+EXIT VALUES
+
+	0
+		hlq ran successfully.
+
+	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+
+	dcp(1) drm(1) dtouch(1) dls(1) decho(1) ddiff(1) dgrep(1) mrm(1)
+	mls(1) sed(1)

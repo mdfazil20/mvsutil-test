@@ -1,0 +1,61 @@
+ZOAVERSION(1)                  ZOAU Command Syntax                 ZOAVERSION(1)
+
+NAME
+
+	zoaversion - Print out ZOAU version information.
+
+SYNOPSIS
+
+	zoaversion [-bcdhjv]
+
+	-b
+		Print out build information (on by default).
+
+	-c
+		Check ZOAU installation and print diagnostic report.
+
+	-d
+		Print debug information.
+
+	-h
+		Display syntax help.
+
+	-j
+		Display output in JSON format.
+
+	-v
+		Print out verbose command information.
+
+
+DESCRIPTION
+
+	The zoaversion utility displays information about the currently installed
+	version of ZOAU. It extracts information from the bin/.buildinfo file
+	in the ZOAU installation directory. Information displayed includes the:
+
+	* build timestamp in Coordinated Universal Time (CUT)
+	* ZOAU version number
+	* git commit ID
+	* APAR (if any)
+	* build IDs
+
+	Note: "unknown" will be displayed if the .buildinfo file cannot be found.
+
+EXAMPLES
+
+	Print out the time when this version of Z Open Automation Utilities
+	was built:
+
+		zoaversion
+
+	Print out a ZOAU diagnostic report to send to IBM for service.
+
+		zoaversion -c
+
+EXIT VALUES
+
+	0
+		zoaversion ran successfully.
+
+ 	non-zero
+		An error occurred. See error messages for details.

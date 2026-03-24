@@ -1,0 +1,45 @@
+RELGEN(1)                     ZOAU Command Syntax                     RELGEN(1)
+
+DISCLAIMER
+	Internal ZOAU utility, behavior may change without prior notice.
+
+NAME
+
+	relgen - Relative generation resolution.
+
+SYNOPSIS
+
+	relgen [-dhv] GENERATION_RELATIVE_NAME
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print verbose information.
+
+
+DESCRIPTION
+
+	relgen resolves a relative generation number into an absolute generation
+	name.
+
+EXAMPLES
+
+	Resolve the latest generation from the generation data group 'ZOAUSER.GDG'
+
+		relgen 'ZOAUSER.GDG(0)'
+
+EXIT VALUES
+
+	0
+		Successful resolution of the relative generation name.
+
+	other
+		Error resolving the relative name. See error messages for details.
+
+SEE ALSO
+
+	dls(1)

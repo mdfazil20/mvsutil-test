@@ -1,0 +1,50 @@
+SMSRAW(1)                      ZOAU Command Syntax                     SMSRAW(1)
+
+NAME
+
+	smsraw - drive an SMS service through batch TSO.
+
+SYNOPSIS
+
+	smsraw [-dhv] [-Q <tmphlq>] <sysin-dataset> <systsin-dataset>
+			<systbl-dataset> [<extra-parms>]
+
+	<sysin-dataset>
+		Name of the dataset or DUMMY if none is required.
+
+	<systsin-dataset>
+		Name of the dataset or DUMMY if none is required.
+
+	<systbl-dataset>
+		Name of the dataset or DUMMY if none is required.
+
+	<extra-parms>
+		Additional parameters (ddnames) to pass to mvscmdauth.
+		(e.g. --ispfile=<ISPFILE dataset>)
+
+	-d
+		Run in debug mode.
+
+	-h
+		Display this syntax message.
+
+	-Q <tmphlq>
+		Use an alternative high-level qualifier (HLQ) for the temporary
+		dataset name. This will override the TMPHLQ environment variable.
+
+	-v
+		Run in verbose mode.
+
+EXIT VALUES
+
+	0
+		Success.
+
+	Other
+		Command failed, see error message for details.
+
+ENVIRONMENT VARIABLES
+
+	TMPHLQ
+		This overrides the current high-level qualifier used for temporary
+		dataset names.

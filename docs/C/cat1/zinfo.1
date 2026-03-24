@@ -1,0 +1,80 @@
+ZINFO(1)                    ZOAU Command Syntax                    ZINFO(1)
+
+NAME
+
+    zinfo - Retrieve and display information about a z/OS system.
+
+SYNOPSIS
+    zinfo [-adhjJpv] [-t <info type>]
+
+    -a
+        Fetch all available information.
+
+    -d
+        Print debug messages from internal errors.
+
+    -h
+        Print syntax information.
+
+    -j
+        Specify JSON format for output data.
+
+    -J
+        Print JSON output in a readable format.
+        Forces -j if not set.
+
+    -p
+        Specify human-readable 'pretty' format. [Default]
+
+    -t  <info type>
+        Specify information 'type' to fetch.
+
+    -v
+        Print all debug messages and some tracing messages.
+
+DESCRIPTION
+
+    Print useful information about a z/OS system to the terminal.
+
+    <info type> may be:
+        - "ipl": system IPL information
+        - "cpu": system CPU information
+        - "sys": system information
+        - "iodf": IODF information
+
+EXAMPLES
+
+    Print all available information to the terminal.
+
+        zinfo -a
+
+    Print all available information to the terminal in JSON format.
+
+        zinfo -ja
+
+    Print only IPL information to the terminal.
+
+        zinfo -t ipl
+
+    Print only IPL and system information to the terminal.
+
+        zinfo -t ipl -t sys
+
+    Print only IPL and system information to the terminal in JSON format.
+
+        zinfo -j -t ipl -t sys
+
+    Print this usage message.
+
+        zinfo -h
+
+EXIT VALUES
+    0
+        zinfo executed a 'best-attempt' to fetch the requested information.
+
+    other
+        An error occurred. See error messages for details.
+
+SEE ALSO
+
+    uname(1)

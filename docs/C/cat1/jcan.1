@@ -1,0 +1,105 @@
+JCAN(1)                        ZOAU Command Syntax                       JCAN(1)
+
+NAME
+
+	jcan - Use an operator command to cancel a job, purge a job, or both.
+
+SYNOPSIS
+
+	jcan [-dhv] <ACTION> <JOBNAME> <JOBNUM>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Use an operator command to cancel a job, purge a job, or both.
+
+	ACTION must be 'C' (cancel) or 'P' (purge).
+
+	JOBNAME can be a job name or job name pattern.
+
+	JOBNUM can be a job number in format 'JOBnnnn' or '//' for all jobs.
+
+	If the 'P' action is used on a job, it will be both canceled and purged.
+	If the job is not in a state where it can be canceled, it will just be
+	purged.
+
+AUTHORIZATION
+
+	The jcan utility requires authorization to use. The submitting user
+	must have READ access to the MVS.MCSOPER.ZOAU profile in the OPERCMD
+	class. Uisng jcan without this authority results in an error message.
+
+	To cancel a job submitted by another user, the JESJOBS class
+	must be active with generics enabled, and the submitting user must have
+	ALTER authority to the resource CANCEL.nodename.user.jobname in the
+	JESJOBS class.
+
+	For example, to grant the user USERB the authority to cancel jobs
+	submitted by the user USERA with a job name of JOBNAME, enter the
+	following TSO commands in the order listed:
+
+		tsocmd "SETROPTS GENERIC(JESJOBS)"
+		tsocmd "RDEFINE JESJOBS CANCEL.*.USERA.JOBNAME UACC(NONE)"
+		tsocmd "PERMIT CANCEL.*.USERA.JOBNAME CLASS(JESJOBS) ID(USERB)
+				ACCESS(ALTER)"
+		tsocmd "SETROPTS RACLIST(JESJOBS) REFRESH"
+
+	To verify that the JESJOBS class is active, use the following TSO command:
+
+		tsocmd "SETROPTS LIST"
+
+	If the JESJOBS class is not active, you can activate it by entering the
+	following TSO commands in the order listed:
+
+		tsocmd "SETROPTS GENERIC(JESJOBS)"
+		tsocmd "SETROPTS CLASSACT(JESJOBS)"
+		tsocmd "SETROPTS RACLIST(JESJOBS)"
+		tsocmd "SETROPTS RACLIST(JESJOBS) REFRESH"
+		tsocmd "SETROPTS RACLIST(JESJOBS)"
+
+ENVIRONMENT VARIABLES
+
+	The following environment variables can be used to alter the behavior of
+	`jcan`.
+
+	CONCHAR
+		Set the JES command prefix character to be used in the cancel command.
+		The default prefix character for JES2 is '$', and for JES3 it is '*'.
+
+		Set this if your installation uses a non-default command prefix
+		character, or if you have multiple JES-es running simultaneously.
+
+		For more information about JES command prefix characters, see the
+		z/OS documentation:
+
+		https://www.ibm.com/docs/en/zos/latest?topic=set-specifying-jes2-command-message-prefixes
+
+EXAMPLES
+
+	Cancels JOB0001 with jobname IBMUSERX:
+
+		jcan C IBMUSERX JOB0001
+
+	Cancels and purges all jobs with jobname IBMUSERX:
+
+		jcan P IBMUSERX //
+
+EXIT VALUES
+
+	0
+		Success
+
+	Other
+		Error, see message for details
+
+SEE ALSO
+
+	ddls(1) jsub(1) pjdd(1) jls(1)

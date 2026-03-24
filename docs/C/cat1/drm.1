@@ -1,0 +1,81 @@
+DRM(1)                         ZOAU Command Syntax                        DRM(1)
+
+NAME
+
+	drm - Remove one or more VSAM clusters, non-VSAM datasets, generation
+		  datasets, or generation data groups.
+
+SYNOPSIS
+
+	drm [-dfFnhv] [<dataset pattern>]+
+
+	-d
+		Print out debug messages.
+
+	-f
+		If the dataset does not exist, do not issue a message.
+
+	-F
+		Forces deletion of a generation data group (GDG) even if it is not empty.
+		When this option is specified the generation datasets (GDS) are deleted
+		before the group base.
+
+	-h
+		Display syntax help.
+
+	-n
+		Non-VSAM datasets are uncataloged but not scratched (removed) from the
+		VTOC of the volume on which they reside.
+
+	-p
+		Force the deletion of non-VSAM datasets even if their retention periods
+		have not expired.
+
+	-v
+		Issue a message for each deleted dataset.
+
+DESCRIPTION
+
+	drm removes VSAM clusters, non-VSAM datasets, generation datasets (GDS),
+	and generation data groups (GDG) that match the pattern specified.
+	drm invokes drmraw. See drmraw(1) for details on additional error messages.
+
+	**NOTE:** If you use wildcard characters, exercise caution to avoid deleting
+	datasets unintentionally.
+
+	Wildcard characters are not permitted in the dataset high-level qualifier
+	(HLQ). Use of a wildcard in the HLQ results in an error.
+
+EXAMPLES
+
+	Delete all datasets owned by TEST01 with a low level qualifier of TXT
+
+		drm 'test01.*.txt'
+
+	Delete the dataset IBMUSER.MY.JCL. Do not issue a message if the
+	dataset does not exist.
+
+		drm -f ibmuser.my.jcl
+
+	Delete the datasets that match IBMUSER.PROJ22.* and the datasets that
+	match IBMUSER.PROJ23.*
+
+		drm 'ibmuser.proj22.*' 'ibmuser.proj23.*'
+
+	Force the deletion of a non-empty generation data group IBMUSER.GDG
+
+		drm -F ibmuser.gdg
+
+EXIT VALUES
+
+	0
+		drm completed without error.
+
+	1
+		Dataset specified by dataset pattern does not exist.
+
+	non-zero
+		Errors occurred. See error messages for details.
+
+SEE ALSO
+	drmraw(1), rm(1), dls(1)

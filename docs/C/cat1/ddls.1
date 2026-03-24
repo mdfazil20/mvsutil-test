@@ -1,0 +1,112 @@
+DDLS(1)                        ZOAU Command Syntax                       DDLS(1)
+
+NAME
+
+    ddls - List ddnames for a given job.
+
+SYNOPSIS
+
+	ddls [-dhijJv] <job id>
+
+	-d
+		Print debug information.
+
+	-h
+		Display syntax help.
+
+	-i
+		Also prints SYSIN ddnames, similar to INPUT ON option in SDSF.
+
+	-j
+		Print output in JSON format in this form:
+			{ "data": { "dd_list": [...] }, "dds_found": <int>, ... }
+
+        Every object in "dd_list" has this structure:
+            {
+                "dsid": 2,
+                "step_name": "JES2",
+                "procstep": "-",
+                "record_format": "UA",
+                "record_length": 133,
+                "records": 37,
+                "bytes": 4900,
+                "dd_name": "JESMSGLG"
+            }
+
+	-J
+		Prints JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-v
+		Print verbose information.
+
+DESCRIPTION
+
+	List ddnames for a given job.
+
+    Output has the following columns:
+        <step name> <proc. name> <ddname> <record format> <record length> <number of records> <dsid> <byte count>
+
+    <step name>
+        Identifying name for the step that created this dataset.
+
+    <proc. name>
+        Name of the procedure that created this dataset.
+        This field shows "-" for datasets not created by a procedure statement.
+
+    <ddname>
+        DDNAME for the dataset creation.
+
+    <record format>
+        Record format.
+
+    <record length>
+        Maximum logical record length.
+
+    <number of records>
+        Number of records in the dataset.
+
+    <dsid>
+        Data set number (key).
+
+    <byte count>
+        Byte count after blank truncation (JES2).
+        Byte count of consumed spool space (JES3).
+
+    Notes:
+     - <number of records> and <byte count> are 0 in the following cases:
+        - The job or step ended abnormally.
+        - The job was created on a different node.
+
+EXAMPLES
+
+    List ddnames for job job01032
+
+        ddls job01032
+
+    Print the step name, ddname, and proc. name while replacing '-' with ' '
+
+        ddls JOB01061 | awk '{ print $1 "\t" $2 "\t" $3}' | tr - " "
+
+    Print SYSOUT and SYSIN ddnames for job J0001061
+
+        ddls -i J0001061
+
+EXIT VALUES
+
+    0
+        Success
+    2
+        Syntax Error
+    4
+        Invalid Argument
+    5
+        Job not ready for DD query
+    6
+        Unable to query DD, job is in transmission
+    8
+        Error, see message for details
+
+SEE ALSO
+
+    jsub(1) jcan(1) pjdd(1) jls(1)

@@ -1,0 +1,172 @@
+DINFO(1)                       ZOAU Command Syntax                      DINFO(1)
+
+NAME
+
+	dinfo - Print out information about a dataset.
+
+SYNOPSIS
+
+	dinfo [-bdhjJlsTuv] [<dataset> <volume>]+
+
+	-b
+		Include block size in the output.
+
+	-d
+		Print debug information.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print the output in JSON format, instead of a list.
+
+	-J
+		Make the JSON output readable.
+		This option forces -j if it was not set.
+
+	-l
+		Print dataset name, dataset organization, record format,
+		logical record length, volume. This is the default.
+
+	-s
+		Print used tracks (in bytes), allocated tracks (in bytes), number of
+		allocated extents, first extent size (in bytes), and secondary space
+		(in bytes) after other information.
+
+		This information is the space that a dataset occupies in a particular
+		volume.
+
+		A multi-volume dataset will have a different amount of allocated
+		space for each of the volumes it resides on. To compute the total,
+		execute the command for each of the volumes the dataset resides on,
+		and sum the allocated space quantity.
+
+	-T
+		Print the dataset type.
+
+	-u
+		Print dataset name, last reference date, dataset organization,
+		record format, logical record length, volume.
+		This is the same as -l with the addition of the reference date.
+
+	-v
+		Print verbose information.
+
+
+DESCRIPTION
+
+	Print out information about a dataset in well-defined columns,
+	making it easy to programmatically extract the fields required.
+
+	When JSON output is requested, the response has the following form:
+		{ "data": { "datasets": [ <dataset object>* ] }, "meta": {} }
+	Where each <dataset object> is an object containing the requested
+	dataset information as strings.
+
+	Field Descriptions, as they appear from left to right in output:
+	  <dataset name>
+		A 44-character field, padded with blanks to the right.
+		The field is the dataset name provided to dinfo.
+
+	  <dataset type>
+		A 9-character field, padded with blanks to the right.
+		The field is the dataset type. For non-VSAM datasets this may be one of:
+			'BASIC'
+			'EXTENDED'
+			'LARGE'
+			'PDS'
+			'PDSE'
+
+	  <reference date> (when -u specified)
+		Date is in the format YYYY/MM/DD. If the dataset has been
+		allocated but not referenced, 0000/01/01 will be printed.
+
+	  <dataset organization>
+		A 3-character field, padded with blanks to the right.
+			'PS' Physical sequential (Basic, Extended, Large)
+			'PO' Partitioned organization (PDSE, PDSE, zFS file system)
+			'VS' Virtual storage access method (VSAM)
+			'U'  Unmovable
+			'DA' Direct access
+			'CX' BTAM or QTAM line group
+			'IS' Indexed sequential
+			'?'  Unknown
+
+	  <record format>
+		A 4-character field, padded with blanks to the right.
+		The first character is one of:
+			'?'	Unknown
+			'V'	Variable record format
+			'F'	Fixed record format
+			'U'	Unknown record format
+		If the dataset is blocked, the next character will be:
+			'B'	Blocked
+		If the dataset is spanned, the next character will be:
+			'S'	Spanned
+		If the dataset contains ANSI-defined printer control characters,
+		the next character will be:
+			'A' ANSI-defined printer control characters present
+
+	  <logical record length>
+		A 5-character field, padded with blanks to the left.
+		The field is the logical record length. If the dataset has a
+		variable record format, the number of bytes available per
+		record will be 4 less than the logical record length, because
+		the logical record length includes the 4 byte prefix
+		containing the record length. If the dataset has an unknown
+		record format, the record length will be 0.
+
+	  <block size>
+		A 5-character field, padded with blanks to the left.
+		The field is the dataset block size, which is seldom required.
+
+	  <volume>
+		A 6-character field, padded with blanks to the right.
+		The field is the volume name provided to dinfo.
+
+	  <used tracks> (when -s specified)
+		An 11-character field, padded with blanks to the left.
+		The number of bytes used on disk, if known.
+		Currently, the used tracks is known for sequential and
+		partitioned datasets (but not PDSEs or VSAM datasets).
+		'?' is printed when the size could not be calculated.
+
+	  <allocated tracks> (when -s specified)
+		An 11-character field, padded with blanks to the left.
+		The number of bytes allocated on disk, if known.
+		Currently, the allocated tracks is known for sequential and
+		partitioned datasets but not VSAM datasets.
+
+	  <extents> (when -s specified)
+	 	The number of extents that the dataset occupies in the volume, if known.
+
+	  <primary> (when -s specified)
+		The number of bytes for the primary space of a dataset, if known.
+
+	  <secondary> (when -s specified)
+		The number of bytes for the secondary space of a dataset, if known.
+
+EXAMPLES
+
+	Print out basic information about the dataset SYS1.PROCLIB on volume C3RES1:
+
+		dinfo sys1.proclib C3RES1
+
+	Print out detailed information including the last reference date,
+	and size details for the dataset SYS1.PARMLIB on volume C3RES1:
+
+		dinfo -s -u SYS1.PARMLIB C3RES1
+
+EXIT VALUES
+
+	0
+  		dinfo ran successfully.
+
+	other
+		Error occurred. See error messages for details.
+
+
+SEE ALSO
+
+	dcp(1) drm(1) dtouch(1) dls(1) decho(1) ddiff(1)
+	dgrep(1) mrm(1) mls(1), sed(1)

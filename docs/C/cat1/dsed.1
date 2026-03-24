@@ -1,0 +1,138 @@
+DSED(1)                        ZOAU Command Syntax                       DSED(1)
+
+NAME
+
+	dsed: A command-line edit of partitioned dataset members
+	and sequential datasets or zFS file.
+
+SYNOPSIS
+
+	dsed [-dfhjJilrsv] [-c <encoding>] [-e <command>]+ <cmd> <dataset>
+
+	-c
+		Dataset encoding. Default is IBM-1047.
+
+	-d
+		Print debug information.
+
+	-e
+		A sed command to execute before <cmd>.
+
+	-f
+		Force open. Open dataset member in DISP=SHR mode.
+		Default is DISP=OLD mode when not provided.
+
+	-h
+		Display this syntax message.
+
+	-j
+		Print a JSON object in this format:
+		{ "data": {"cmd": "<command>", 
+		"found": <integer>, 
+		"changed": <boolean> } }
+
+	-J
+		Print JSON output in a readable format.
+		This option enables -j if it was not specified.
+
+	-l
+		Obtain exclusive lock for the dataset.
+
+	-r
+		Use back references in regular expressions.
+
+	-s
+		Stop executing sed commands if current command was successful.
+
+	-v
+		Print verbose information.
+
+
+DESCRIPTION
+
+	dsed 's/<regex>/<line>/g'    dest         #replace word (global replace)
+	dsed '/<regex>/c\<line>'     dest         #replace line global
+	dsed '<n> c\<line>'          dest         #replace nth line
+	dsed '/<regex>/c\<line>/<n>' dest         #replace line first match n=1,last match n=$
+	dsed '/<regex>/a\<line>'     dest         #insert after(greedy match and insert)
+	dsed '/<regex>/i\<line>'     dest         #insert before(greedy match and insert)
+	dsed '/<regex>/a\<line>/<n>' dest         #insert after(non-greedy match and insert,first match n=1,last match n=$)
+	dsed '/<regex>/i\<line>/<n>' dest         #insert before(non-greedy match and insert,first match n=1,last match n=$)
+	dsed '1 i\<line>'            dest         #insert BOF
+	dsed '$ a\<line>'            dest         #append EOF
+	dsed '<n> a\<line>'          dest         #append to nth line
+	dsed '<n> i\<line>'          dest         #insert before nth line
+	dsed '/<regex>/d'            dest         #delete regex existed line
+	dsed -e <command1> -e <command2>    dest  #multiple sed commands
+	dsed -d <command>            dest         #modify target file, print debug information
+	dsed -c ISO8859-1 <command>  dest         #modify ASCII dataset
+	dsed -s -e <command1> -e <command2> dest  #multiple sed commands, will not execute command2 if command1 was successful
+
+	NOTES
+
+		'#' can be used as the delimiter instead of '/'.
+		Do not escape curly braces in regular expressions.
+
+	dsed supports operations over generation datasets (GDS) that are referenced
+	by relative name, but does not protect the generation data group base during
+	execution. To request exclusive control of a group, use a batch job or mvscmd.
+	To learn more about this topic see:
+	https://www.ibm.com/docs/en/zos/latest?topic=jobs-submitting-multiple-update-generation-data-group
+
+	Relative names are useful only when modifying sequential datasets.
+	To reference a PDS or PDSE member from a GDS, use its absolute name.
+
+EXAMPLES
+
+	Change all occurrences of '1st' to 'change':
+
+		dsed  's/1st/change/g'  IBM.TEXT
+
+	Replace lines containing '1st' with 'this is changed':
+
+		dsed  '/1st/c\\this is changed'  IBM.TEXT
+
+	Replace the last line containing '1st' with 'this is changed':
+
+		dsed  '/1st/c\\this is changed/$'  IBM.TEXT
+
+	Insert 'this is appended' after last line containing '1st':
+
+		dsed  '/1st/a\\this is appended/$'  IBM.TEXT
+
+	Insert 'this is inserted' before any line containing '1st':
+
+		dsed  '/1st/i\\this is inserted'  IBM.TEXT
+
+	Delete any line containing '1st':
+
+		dsed  '/1st/d' IBM.TEXT
+
+	Delete all the lines containing a capital letter followed by 3 digits:
+
+		dsed /[A-Z][0-9]{3}/d IBM.TEXT
+
+	Add a new line to beginning of the file:
+
+		dsed  '1 i\\this is an added line' IBM.TEXT
+
+	Insert a new line after the 2nd line:
+
+		dsed  '2 a\\this is an added line' IBM.TEXT
+
+	Change all occurrences of '1st' to 'change' (using '#' as delimiter):
+
+		dsed  's#1st#change#g'  IBM.TEXT
+
+
+EXIT VALUES
+
+	0
+		dsed successfully applied the command to the dataset.
+
+	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+
+	dmod(1), dgrep(1)

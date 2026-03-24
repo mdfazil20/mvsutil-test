@@ -1,0 +1,272 @@
+JLS(1)                         ZOAU Command Syntax                        JLS(1)
+
+NAME
+
+    jls - List jobs that match the provided owner and prefix.
+
+SYNOPSIS
+
+    jls [-dhjJlv] [-o <field list>] '[/owner][/job]'
+
+    -d
+        Print debug information. (changes output)
+
+    -h
+        Display syntax help.
+
+    -j
+        Print output in JSON format in this form:
+            { "data": { "JOBXXXXX":{...} }, "meta": {...} }
+
+        Each object will have only the fields requested with the
+        -o or -l options.
+
+    -J
+        Prints JSON output in a readable format.
+        This option forces -j if it was not set.
+
+    -l
+        Print additional fields.
+        Note: this option may take a long time to process.
+
+    -v
+        Print verbose information and a list header.
+
+    -o <field list>
+        The output list will include only the fields specified in <field list>.
+        Order of <field list> is maintained. Names are case insensitive.
+
+    Note: If both -l and -o options are enabled, -l will be ignored.
+
+DESCRIPTION
+
+    jls lists all jobs that match the provided filter.
+
+    Note: The jls utility lists jobs exclusively from the single active JES address 
+    space within the LPAR where it is executed. Cross-JES routing is not supported 
+    for listing jobs on remote sysplex nodes.
+
+    Output has the following fields by default:
+        <owner> <name> <id> <status> <ccode>
+
+    Additionally, these fields are appended when using the -l option:
+        <jobclass> <serviceclass> <priority> <asid> <creationdate>
+        <creationtime> <queueposition> <programname> <jobtype> <executiontime>
+        <executionseconds> <system> <subsystem> <onode> <xnode> <membname>
+        <cputime> <srbtime>
+
+    A value of '?' represents an unknown value for that particular field.
+    It can take some time for a job to have all of its fields populated.
+    Try again in a few seconds if '?' is an unexpected response.
+
+    <owner>
+        Owner of the job (e.g. IBMUSER)
+        '?' returned if unknown or pending
+
+    <name>
+        Name of the job (e.g. IBMUSER1)
+        '?' returned if unknown or pending
+
+    <id>
+        ID of the job (e.g. JOB12345)
+        '?' returned if unknown or pending
+
+    <status> can be one of:
+        ABEND       : Ended abnormally.
+        AC          : Active.
+        CAB         : Converter abend.
+        CANCELED    : Job was canceled.
+        CC          : Completed normally.
+        CNV         : Converter error.
+        EOM         : Job failed in EOM.
+        FLU         : Job has been flushed.
+        HOLD        : Job is being held.
+        JCLERR      : Job had a JCL error.
+        NOEXEC      : Job has SCAN or COPY JCL run type.
+        SEC         : Security error.
+        SYS         : System failure.
+        ?           : Error or unknown status.
+
+    <ccode> can be one of:
+        <number>        : Maximum condition code of all job steps.
+        <alpha-numeric> : Abend code of step that abended.
+        ?               : Job is running or did not execute. Code is unknown.
+
+    <jobclass>
+        Job class.
+
+    <serviceclass>
+        WLM service class. This value is only available if any of the following are true:
+          - Job is awaiting execution.
+          - Job is scheduled to a WLM managed job class.
+          - Job is not held (duplicate job name, operator hold, etc.)
+          - Member it has affinity to is available.
+          - The scheduling environment is available.
+        '?' returned if unknown or pending.
+
+    <priority>
+        Job priority.
+
+    <ASID>
+        The Address Space Identifier (ASID) is a unique descriptor for the job address space.
+        Zero if not active.
+
+     <creationdate>
+        Input start date in format YYYY/MM/DD.
+
+     <creationtime>
+        Input start time in format HH:MM:SS.
+
+    <queueposition>
+        Position of job on class queue or phase queue.
+
+    <programname>
+        This field is only valid for JES2 systems; in JES3 systems the value is
+        always '?'. In JES2, this field displays the program name from the job's
+        last completed step, which is derived from the PGM= parameter on the
+        EXEC card.
+
+    <jobtype>
+        Type of address space. Can be one of:
+          APPC  : APPC Initiator.
+          JGRP  : JOBGROUP.
+          JOB   : Batch job.
+          STC   : Started task.
+          TSU   : Time sharing user.
+          ?     : Unknown or pending.
+
+    <executiontime>
+        Elapsed execution time in the format [ddd-]HH:MM:SS.
+        The length of this field is always 12 characters. The first four
+        characters are blank if the elapsed time is less than 24 hours.
+          ddd-  : Number of 24 hour segments (days) if the job ran longer than 24 hours.
+                  The dash character separates elapsed days from hours.
+                  The maximum value that can be displayed is 999 days. Jobs that
+                  run longer will continue to display this value.
+          HH    : Number of hours (00 to 23).
+          MM    : Number of minutes (00 to 59).
+          SS    : Number of seconds (00 to 59).
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+
+    <executionseconds>
+        Number of seconds the job executed for.
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+
+    <system>
+        MVS system name where the job ran.
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+          - Job did not execute due to its TYPRUN value.
+
+    <subsystem>
+        Name of the subsystem that executed the job.
+
+    <onode>
+        Origin node (node that submitted the job).
+
+    <xnode>
+        Execution node.
+
+    <membname>
+        Execution JES member name.
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+          - Job did not execute due to its TYPRUN value.
+
+    <cputime>
+        Sum of the CPU time used by each job step, in microseconds.
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+
+    <srbtime>
+        Sum of the service request block (SRB) time for each job step, in microseconds.
+        The value is '?' in any of the following cases:
+          - Job is awaiting execution.
+          - Job did not execute due to an error.
+
+EXAMPLES
+
+    Shows jobs with no owner/prefix specification:
+
+        jls
+
+        jls '/*'
+
+    Shows caller's jobs:
+
+        jls '*'
+
+    Show caller's jobs with additional fields and a header:
+
+        jls -lv '*'
+
+    Shows all jobs for IBMUSER:
+
+        jls '/IBMUSER'
+
+    Shows caller's job JOB01108:
+
+        jls 'job01108'
+
+    Show the ID, name, status, and job class for job JOB01108:
+
+        jls -o id,name,status,jobclass 'job01108'
+
+    Show all fields from the -l option (except for programname) for
+    the caller's jobs, with a header:
+
+        jls -v -o owner,name,id,status,ccode,jobclass,serviceclass,priority,asid,creationdate,creationtime,queueposition,jobtype,executiontime '*'
+
+    Get a JSON string with name, owner, and creation date fields:
+
+        jls -o name,owner,creationdate -j '*'
+
+    Show the status and execution time for active job J0000604, with a header:
+
+        jls -v -o id,status,ccode,executiontime,executionseconds J0000604
+
+        The job is currently active, and the command produces the following output:
+
+        id       status   ccode executiontime executionseconds
+        J0000604 AC           ?      00:01:04               64
+
+    Show the name, status, and execution time for long-running SYSLOG jobs:
+
+        jls -o id,name,status,ccode,executiontime,executionseconds '//SYSLOG'
+
+        The jobs have been running for over three days, and the command produces
+        the following output:
+
+        id       name     status   ccode executiontime executionseconds
+        S0000003 SYSLOG   AC           ?    3-03:39:59           272399
+        S0000002 SYSLOG   AC           ?    3-03:40:35           272435
+        S0000001 SYSLOG   AC           ?    3-03:49:31           272971
+
+    Show the status and execution time for a complete job:
+
+        jls -v -o id,ccode,executiontime,executionseconds J0000271
+
+        The job ran for a short time, and the command produces the following output:
+
+        id       status   ccode executiontime executionseconds
+        J0000271 CC        0000      00:00:05                5
+
+
+EXIT VALUES
+
+    0
+        Success
+
+    non-zero
+        Error occurred. See error messages for details.
+
+SEE ALSO
+
+    ddls(1) jsub(1) jcan(1) pjdd(1)

@@ -1,0 +1,83 @@
+DECHO(1)                       ZOAU Command Syntax                      DECHO(1)
+
+NAME
+
+	decho - Echo text to a fully qualified PDS member or sequential dataset.
+
+SYNOPSIS
+
+	decho [-adfhv] "text" <DATASET>
+
+	-a
+		Append to the dataset instead of overwriting it.
+
+	-d
+		Print out debug messages.
+
+	-f
+		Force open. Open dataset member in DISP=SHR mode.
+		When not provided, the default is DISP=OLD.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Write text, which may be multiple lines, to a dataset.
+	If the -a option is specified, text will be appended to the end
+	of the existing dataset or PDS member.
+
+	If the -a option is not specified, the contents of the dataset
+	will be overwritten.
+
+	decho also accepts text from stdin.
+
+	If the provided text starts with a dash (-), it is treated
+	like an command line argument. To avoid this, specify a double
+	dash (--) immediately prior to the text argument. This terminates
+	argument processing and treats the next argument as the text to be
+	echoed.  See EXAMPLES for more information.
+
+	decho supports generation dataset relative name notation. This is only
+	useful when working with sequential datasets. When a positive generation
+	level is provided, decho creates a sequential generation dataset with
+	variable record format. To write text to a member from a generation data
+	set use its absolute name.
+
+EXAMPLES
+
+	Write 3 lines of text to the dataset TSTRADM.PROG.SYSIN:
+
+		decho "Line 1
+		Line 2
+		Line 3" tstradm.prog.sysin
+
+	Write one line of text to the PDS member TEST.TEXT(MSG).
+	Then append a second line of text to the PDS member:
+
+		decho 'Hello' 'test.text(msg)'
+		decho -a 'Goodbye' 'test.text(msg)'
+
+	Write one line of text to the dataset TSTRADM.PROG.SYSIN:
+
+		echo "line 1" | decho "STRADM.PROG.SYSIN"
+
+	Write a line of text starting with a hyphen to the dataset
+	ZOAU.TEST:
+
+		decho -- "-Hello, world!" ZOAU.TEST
+
+EXIT VALUES
+
+	0
+		Dataset or PDS member was updated successfully.
+
+	non-zero
+		decho encountered an error. See error messages for details
+
+SEE ALSO
+
+	echo(1)

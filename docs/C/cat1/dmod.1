@@ -1,0 +1,152 @@
+DMOD(1)                        ZOAU Command Syntax                       DMOD(1)
+
+NAME
+
+	dmod - A command-line multi-line (block) edit of partitioned dataset members,
+	sequential datasets, generation datasets, or z/OS UNIX files.
+
+SYNOPSIS
+
+	dmod [-bdfhijJlrsv] [-c <encoding>]
+		[-m <marker_begin>\n<marker_end>\n< {mark} marker>]
+		[-e <command>]+ <cmd> <dataset>
+
+	-b
+		Block operation mode.
+
+	-c ENCODING
+		Specifies dataset encoding. The default is IBM-1047.
+
+	-d
+		Print out debug messages.
+
+	-e COMMAND
+		For executing multiple sed commands. In block mode it should be used
+		with -s.
+
+	-f
+		force open. Open dataset member in DISP=SHR mode. (Default is DISP=OLD).
+
+	-h
+		Display syntax help.
+
+	-j
+		Print a JSON object in this format:
+		{ "data": {"cmd": "<command>",
+		"found": <integer>,
+		"changed": <boolean> } }
+
+	-J
+		Print JSON output in a readable format. This option enables -j if it
+		was not specified.
+
+	-l
+		Obtain exclusive lock on the dataset to be modified.
+
+	-m MARKER_TEMPLATE
+		The marker line template. The template should be 3 sections separated by '\n'.
+		"{mark}" should be included in the < {mark} marker> (default="# {mark} MANAGED BLOCK") section
+		and will be replaced with <marker_begin> (default="BEGIN") and <marker_end> (default="END").
+		The two marker lines will be surrounding the lines that are going to be inserted.
+		Marker lines can only be used once. If marker lines already exist in the dataset or UNIX file,
+		they will be removed with the surrounding lines before new lines are inserted.
+
+	-r
+		Use back references in regular expressions.
+
+	-s
+		Stop executing sed commands if current command was successful.
+
+	-v
+		Print out verbose command information.
+
+NOTES
+
+	dmod supports operations over generation datasets (GDS) that are referenced
+	by relative name, but does not protect the generation data group base during
+	execution. To request exclusive control of a group, use a batch job or mvscmd.
+	To learn more about this topic see:
+	https://www.ibm.com/docs/en/zos/latest?topic=jobs-submitting-multiple-update-generation-data-group
+
+	Relative names are useful only when modifying sequential datasets.
+	To reference a PDS or PDSE member from a GDS, use its absolute name.
+
+DESCRIPTION
+
+Block mode:
+	dmod -b "/<regex>/a\<line1>[\nline2\nline3 ...]/$"       dest     #insert line(s) after the last matching pattern with default marker
+	dmod -b "/<regex>/i\<line1>[\nline2\nline3 ...]/$"       dest     #insert line(s) before the last matching pattern with default marker
+	dmod -b "$ a\<line1>[\nline2\nline3 ...]"                dest     #insert line(s) EOF with default marker
+	dmod -b "1 i\<line1>[\nline2\nline3 ...]"                dest     #insert line(s) BOF with default marker
+	dmod -b "//d"                                            dest     #delete the last block with matching default marker
+	dmod -b -m "<marker_begin>\n<marker_end>\n< {mark} marker>" \
+				"/<regex>/a\<line1>[\nline2\nline3 ...]/$"    dest     #insert line(s) after the last matching pattern with custom marker
+	dmod -b -m "<marker_begin>\n<marker_end>\n< {mark} marker>" \
+				"/<regex>/i\<line1>[\nline2\nline3 ...]/$"    dest     #insert line(s) before the last matching pattern with custom marker
+	dmod -b -m "<marker_begin>\n<marker_end>\n< {mark} marker>" \
+				"$ a\<line1>[\nline2\nline3 ...]"             dest     #insert line(s) EOF with custom marker
+	dmod -b -m "<marker_begin>\n<marker_end>\n< {mark} marker>" \
+				"1 i\<line1>[\nline2\nline3 ...]"             dest     #insert line(s) BOF with custom marker
+	dmod -b -m "<marker_begin>\n<marker_end>\n< {mark} marker>" \
+				"//d"                                         dest     #delete the last block with matching custom marker
+	dmod -b -c ISO8859-1 <command>                           dest     #modify ASCII dataset
+	dmod -b -s -e <command1> -e <command2>                   dest     #multiple sed commands, will not execute command2 if command1 was successful
+
+Normal mode:
+	dmod "s/<regex>/<line>/g"    dest         #replace word (global replace)
+	dmod "/<regex>/c\<line>"     dest         #replace line global
+	dmod "<n> c\<line>"          dest         #replace nth line
+	dmod "/<regex>/c\<line>/<n>" dest         #replace line first match n=1,last match n=$
+	dmod "/<regex>/a\<line>"     dest         #insert after(greedy match and insert)
+	dmod "/<regex>/i\<line>"     dest         #insert before(greedy match and insert)
+	dmod "/<regex>/a\<line>/<n>" dest         #insert after(non-greedy match and insert,first match n=1,last match n=$)
+	dmod "/<regex>/i\<line>/<n>" dest         #insert before(non-greedy match and insert,first match n=1,last match n=$)
+	dmod "1 i\<line>"            dest         #insert BOF
+	dmod "$ a\<line>"            dest         #append EOF
+	dmod "<n> a\<line>"          dest         #append to nth line
+	dmod "<n> i\<line>"          dest         #insert before nth line
+	dmod "/<regex>/d"            dest         #delete regex existed line
+	dmod -e <command1> -e <command2>    dest  #multiple sed commands
+	dmod -d <command>            dest         #modify target file, print debug information
+	dmod -c ISO8859-1 <command>  dest         #modify ASCII dataset
+	dmod -s -e <command1> -e <command2> dest  #multiple sed commands, will not execute command2 if command1 was successful
+
+EXAMPLES
+
+Block mode:
+	Insert a block(3 lines) after last line containing "1st" with custom marker:
+		dmod -b -m "OPEN\nCLOSE\n# {mark} IBM BLOCK" "/1st/a\line 1\nline 2\nline 3/$"  IBM.TEXT
+	Insert a block(3 lines) EOF with default marker:
+		dmod -b "$ a\line 1\nline 2\nline 3"  IBM.TEXT
+	Delete last matching block with custom marker:
+		dmod -b -m "OPEN\nCLOSE\n# {mark} IBM BLOCK" "//d"  IBM.TEXT
+
+Normal mode:
+	Change all occurrences of "1st" to "change":
+		dmod  "s/1st/change/g"  IBM.TEXT
+	Replace lines containing "1st" with "this is changed":
+		dmod  "/1st/c\\this is changed"  IBM.TEXT
+	Replace the last line containing "1st" with "this is changed":
+		dmod  "/1st/c\\this is changed/$"  IBM.TEXT
+	Insert "this is appended" after last line containing "1st":
+		dmod  "/1st/a\\this is appended/$"  IBM.TEXT
+	Insert "this is inserted" before any line containing "1st":
+		dmod  "/1st/i\\this is inserted"  IBM.TEXT
+	Delete any line containing "1st":
+		dmod  "/1st/d" IBM.TEXT
+	Add a new line to beginning of the file:
+		dmod  "1 i\\this is an added line" IBM.TEXT
+	Insert a new line after the 2nd line:
+		dmod  "2 a\\this is an added line" IBM.TEXT
+
+EXIT VALUES
+
+	0
+		dmod successfully applied the command to the dataset.
+
+	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+
+	sed(1), dgrep(1)

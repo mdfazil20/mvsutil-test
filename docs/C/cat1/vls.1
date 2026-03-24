@@ -1,0 +1,62 @@
+VLS(1)                        ZOAU Command Syntax                       VLS(1)
+
+NAME
+
+	vls - Lists VSAM datasets, alternate indexes, and paths that match a
+	pattern.
+
+SYNOPSIS
+
+	vls [-dhlmv] <DATASET-PATTERN>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-l
+		List details.
+
+	-m
+		List migrated datasets.
+
+	-v
+		Print verbose information.
+
+DESCRIPTION
+
+	vls lists VSAM datasets that match the pattern which is specified to stdout.
+	The VSAM components are included for each VSAM cluster.
+
+	If you specify -m, migrated datasets will also be displayed in the output.
+
+DATASET PATTERNS
+
+	The following rules apply to <DATASET-PATTERN>.
+
+	The high-level-qualifier (HLQ) must be specified in full.
+	An asterisk (*) matches any sequence of characters.
+	A question mark (?) matches a single character.
+
+EXAMPLES
+
+	List all VSAM datasets that start with IBMUSER.MVSCMD
+
+		vls IBMUSER.MVSCMD.*
+
+EXIT VALUES
+
+	0
+		At least one dataset was found matching a dataset-pattern
+
+  	1
+		No datasets were found.
+
+	other
+		Error in dataset listing. See error messages for details.
+
+SEE ALSO
+
+	dinfo(1) dcp(1) drm(1) dtouch(1) dls(1) decho(1) ddiff(1)
+	dgrep(1) dsed(1) mrm(1) mls(1)

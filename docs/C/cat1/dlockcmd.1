@@ -1,0 +1,65 @@
+DLOCKCMD(1)                    ZOAU Command Syntax                   DLOCKCMD(1)
+
+NAME
+
+	dlockcmd - Command line interface for obtaining an exclusive lock on a
+	dataset	or dataset member.
+
+SYNOPSIS
+
+	dlockcmd <DATASET_NAME> <SECONDS_TO_SLEEP>
+
+DESCRIPTION
+
+	dlockcmd forks a child process and exits. The child process tries to
+	obtain an exclusive lock on the dataset or dataset member by calling
+	the dataset_lock() function and will automatically unlock
+	the dataset upon termination after the given seconds of sleep.
+
+	In order to manually unlock the dataset, SIGQUIT signal should be send to
+	the	child process_id (i.e kill -SIGQUIT 1234567). The signal will be handled
+	and dataset_unlock() will be called to unlock the dataset.
+
+	Lock return codes - dataset_lock(char *dsname):
+	0  - Active task now has control of the resource.
+	4  - The resource is not immediately available.
+	8  - A previous request for control of the same resource has
+			been made for the same task.  The task has control of the
+			resource.
+	14 - A previous request for control of the same resource has
+			been made for the same task.  The task does not have
+			control of the resource.
+	18 - Environmental error.  The limit for the number of
+			concurrent resource requests has been reached.  The task
+			does not have control of the resource unless some previous
+			ENQ or RESERVE request caused the task to obtain control
+			of the resource.
+
+	Unlock return codes - dataset_unlock(char *dsname):
+	0  - The system has released the resource.
+	4  - The resource has been requested for the task, but
+			the task has not been assigned control of it.  The
+			task continues waiting  (This return code might result
+			if an exit routine, which received control because of
+			an interruption, issued the DEQ macro on behalf of
+			the task).
+	8  - Control of the resource has not been requested by
+			the active task, or the resource has already been
+			released.
+
+EXAMPLES
+
+	Lock a dataset member for 1000 seconds
+		dlockcmd "SOME.PARTITONED.DS(MEM)" 1000
+
+	Unlock the dataset locked by dlockcmd with process ID 1234567
+		kill -SIGQUIT 1234567
+
+
+EXIT VALUES
+
+	0
+		dlockcmd successfully locked/unlocked the dataset.
+
+	non-zero
+		An error occurred. See error messages for details.

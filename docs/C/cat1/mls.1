@@ -1,0 +1,140 @@
+MLS(1)                         ZOAU Command Syntax                        MLS(1)
+
+NAME
+
+	mls - List partitioned dataset members and aliases.
+
+SYNOPSIS
+
+	mls [-AdegHhJjSvx] <DATASET_PATTERN>[(<MEMBER_PATTERN>)]
+
+	-A
+		Display the alias or member indicator, and the associated member name.
+
+	-d
+		Print out debug messages.
+
+	-e
+		Print extended attributes.
+
+	-g
+		Group member aliases.
+
+	-H
+		Hide member aliases.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print the output in JSON format.
+
+	-J
+		Print JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-S
+		Print ISPF statistics.
+
+	-v
+		Print verbose name output.
+
+	-x
+		Display a header for the listing.
+
+DESCRIPTION
+
+	mls prints members that match <MEMBER_PATTERN> from the partitioned
+	dataset matching <DATASET_PATTERN> to stdout.
+
+	If <MEMBER_PATTERN> is not provided, all members are listed.
+
+	mls is able to list the members of a partitioned generation dataset (GDS).
+	GDS relative name notation is supported when the name is fully specified.
+
+	When -A is specified, a member or alias indicator is displayed, aliases
+	will also display the associated member name.
+
+	Use the `-e` option to display the extended attributes:
+		* Last user that modified the member
+		* Codeset name
+		* Last modification time
+	A member without extended attributes will display zeros or the character '-'
+	for these fields.
+
+	mls prints the full list of members and aliases by default. Use the -H
+	option to hide all aliases.
+
+	When -g is specified, a member is followed by all of its aliases, and each
+	group is separated by a newline. The MEMBER_PATTERN argument only applies
+	to true members. Associated aliases of the members are still listed even if
+	their names do not match.
+
+	The -S option will display the ISPF member statistics:
+		* Version number and modification level
+		* SCLM
+		* Current number of lines
+		* Initial number of lines
+		* Number of modified lines
+		* Creation date
+		* Date last modified
+		* Time last modified
+		* User ID
+	A member without ISPF statistics will display zeros or the character '-' for
+	these fields.
+
+	When detailed listings are requested with the -AeS options, and the JSON
+	output is enabled, the response has the following form:
+	{
+		"data": {
+			"members": [
+				{
+					"name": 'MEMBER',
+					"is_alias": false,
+					"ispf_stats": {...},
+					"ext_attr": {...},
+				},
+				...
+			]
+		}
+	}
+
+	If a member does not contain extended attributes or ISPF statistics, the
+	corresponding values for these keys will be an empty object.
+
+EXAMPLES
+
+	List all the members of SYS1.PARMLIB:
+
+		mls SYS1.PARMLIB
+
+	List all the members of PARMLIB that start with IEA and end with 0
+	followed by a single character:
+
+		mls 'sys1.parmlib(iea*0?)'
+
+	List the members in the latest partitioned generation dataset from the GDG
+	ZOAUSER.GDG:
+
+		mls 'ZOAUSER.GDG(0)'
+
+EXIT VALUES
+
+	0
+		mls completed without error.
+
+	1
+		dataset specified by dataset pattern does not exist.
+
+	2
+		no members specified by <member pattern> exist
+
+	3
+		multiple datasets match <dataset pattern>.
+
+	non-zero
+		Errors occurred. See error messages for details.
+
+SEE ALSO
+
+	ls(1) dls(1) mrm(1)

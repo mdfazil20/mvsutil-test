@@ -1,0 +1,50 @@
+MVSCMDMSG(1)                   ZOAU Command Syntax                  MVSCMDMSG(1)
+
+NAME
+
+	mvscmdmsg - Print a ZOAU message or man page to stderr.
+
+SYNOPSIS
+
+	mvscmdmsg [-dhv] COMMAND MSG_NUMBER MSG_TYPE [SUBSTITUTION_STRING]*
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	For a given ZOAU command, retrieve MSG_NUMBER with a corresponding
+	MSG_TYPE (one of I,W,S,E) from the docs directory for the given
+	national language, perform substitution for the parameters specified,
+	then write the message to stderr.
+
+	Message number 0 is recognized as a syntax request and the file
+	"command.1" is read from the docs directory.
+
+	All other message numbers are recognized as error messages and
+	the message is retrieved from the file "command-msg.1"
+
+EXAMPLES
+
+	Print out informational message 2 for the mvscmd command:
+
+		mvscmdmsg mvscmd 2 I
+
+	Print out error message 5 for the opercmd command, and substitute
+	"100" for the first fill-in in the message.
+
+		mvscmdmsg opercmd 5 E 100
+
+EXIT VALUES
+
+	0
+		mvscmdmsg completed without error.
+
+	non-zero
+		mvscmdmsg failed. See error messages for details.

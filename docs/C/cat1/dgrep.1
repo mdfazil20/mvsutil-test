@@ -1,0 +1,149 @@
+DGREP(1)                       ZOAU Command Syntax                      DGREP(1)
+
+NAME
+
+	dgrep - Search for a pattern across all datasets (partitioned and
+	sequential) matching one or more dataset patterns.
+
+SYNOPSIS
+
+	dgrep [-cdhijJnv] [-C <NUM>] <PATTERN> [<DATASET-PATTERN>]+
+
+	-c
+		Print only the number of matches for each dataset.
+
+	-C <NUM>
+
+		Display <NUM> lines of context around a match.
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-i
+		Ignore case.
+
+	-j
+		Print output in JSON format.
+
+	-J
+		Prints JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-n
+		Display line numbers.
+
+	-v
+		Print names of datasets being searched
+
+DESCRIPTION
+
+	Search for <PATTERN> across the datasets specified in <DATASET-pattern>,
+	writing matching lines to the console.
+
+	If -i is specified, then the search will be case insensitive.
+
+	If the -n option is specified, line numbers for the matching lines
+	will be displayed.
+
+	If context lines are requested with the -C option, then up to <NUM>
+	lines before and after the matching line will also be printed.
+
+DATASET PATTERNS
+
+	The following rules apply to <DATASET-PATTERN>.
+
+	The high-level qualifier (HLQ) must be specified in full.
+	An asterisk (*) matches any sequence of characters.
+	A question mark (?) matches a single character.
+
+EXAMPLES
+
+	Search for 'rexx' (case sensitive) in all datasets matching IBM.TSO.*:
+
+		dgrep rexx 'IBM.TSO.*'
+
+	Get a count of lines containing 'rexx' in all datasets matching IBM.TSO.*:
+
+		dgrep -c rexx 'IBM.TSO.*'
+
+	Search for 'Hi' (case insensitive) in all datasets matching IBM.*.C??:
+
+		dgrep -i Hi 'IBM.*.C??'
+
+	Search for 'test' in sequential and partitioned datasets,
+	and display result in JSON format:
+
+		dgrep -j test IBM.DATA.*
+
+		Output with results found:
+
+			{
+				"data": {
+					"IBM.DATA.SEQ": "test line\ntest line\ntest line",
+					"IBM.DATA.PDS": {
+						"MEMBER1": "test line\ntest line\ntest line",
+						"MEMBER2": "test line\ntest line\ntest line",
+						"MEMBER3": "test line\ntest line\ntest line"
+					}
+				},
+				"program": "dgrep",
+				"options": "-j",
+				"rc": "0"
+			}
+
+		Output with no results found:
+
+			{"data":{},"program":"dgrep","options":"-j","rc":"1"}
+
+	Search for 'test' in the latest generation from the GDG IBM.GDG:
+
+		dgrep test 'IBM.GDG(0)'
+
+	Count records that contain 'test' in sequential and partitioned datasets,
+	and display result in JSON format:
+
+		dgrep -j -c test IBM.DATA.*
+
+		Output with results found:
+
+			{
+				"data": {
+					"IBM.TEST.SEQ": "4",
+					"IBM.TEST.PDS": {
+						"MEMBER1": "4",
+						"MEMBER2": "4",
+						"MEMBER3": "20"
+					}
+				},
+				"program": "dgrep",
+				"options": "-j",
+				"rc": "0"
+			}
+
+		Output with no results found:
+
+			{"data":{"IBM.TEST.SEQ":"0","IBM.TEST.PDS":"0"},"program":"dgrep","options":"-j -c","rc":"0"}
+
+EXIT VALUES
+
+	0
+		At least one match for the pattern was found.
+
+  	1
+		No matches for the pattern were found.
+
+  	2
+		An error occurred trying to list dataset. See error messages for details.
+
+  	4
+		Incorrect options specified.
+
+  	other
+		Error in search. See error messages for details.
+
+SEE ALSO
+
+	grep(1)

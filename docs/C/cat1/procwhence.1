@@ -1,0 +1,39 @@
+PROCWHENCE(1)                  ZOAU Command Syntax                 PROCWHENCE(1)
+
+NAME
+
+	procwhence - Determine the source dataset of a proclib concatenation member.
+
+SYNOPSIS
+
+	procwhence [-dhv] <MEMBER-NAME>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	procwhence searches the proclib concatenation for a particular dataset
+	member. It prints the name of the dataset where the member is found.
+
+EXAMPLES
+
+	procwhence IEAVIPCS
+
+EXIT VALUES
+
+	0
+		Success
+
+	Other
+		Error, see message for details
+
+SEE ALSO
+
+	parmwhence(1)

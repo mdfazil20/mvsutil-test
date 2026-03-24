@@ -1,0 +1,59 @@
+PARMGREP(1)                    ZOAU Command Syntax                   PARMGREP(1)
+
+NAME
+
+	parmgrep - Search for a string across the parmlib concatenation.
+
+SYNOPSIS
+
+	parmgrep [-dhinv] <str> <dataset-pattern>
+
+	-d
+	 	Print out debug messages.
+
+	 -h
+	 	Display syntax help.
+
+	 -i
+	 	Ignore case.
+
+	 -n
+	 	Display line numbers.
+
+	 -v
+	 	Print out verbose command information.
+
+DESCRIPTION
+
+	Search for a string across the parmlib concatenation matching a pattern.
+
+DATASET PATTERNS
+
+	The following rules apply to <dataset-pattern>.
+
+	The high-level qualifier (HLQ) must be specified in full.
+	An asterisk (*) matches any sequence of characters.
+	A question mark (?) matches a single character.
+
+EXAMPLES
+
+	Search for 'rdtd' (case sensitive) across the parmlib concatenation.
+
+		parmgrep rdtd
+
+ 	Search for Hello (case insensitive) across the parmlib concatenation,
+	displaying line numbers.
+
+		parmgrep -in Hello
+
+EXIT VALUES
+
+	0
+		parmgrep completed successfully.
+
+	Other
+		Error, see message for details.
+
+SEE ALSO
+
+	parmwhence(1), procgrep(1)

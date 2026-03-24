@@ -1,0 +1,42 @@
+PARMWHENCE(1)                  ZOAU Command Syntax                 PARMWHENCE(1)
+
+NAME
+
+	parmwhence - Find the dataset in the parmlib concatenation that a member
+	comes from.
+
+SYNOPSIS
+
+	parmwhence [-dhv] <member-name>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Given a member, print the dataset it belongs to from the parmlib
+	concatenation.
+
+EXAMPLES
+
+	Print out the name of the dataset that member IEAVIPCS is in.
+
+		parmwhence ieavipcs
+
+EXIT VALUES
+
+	0
+		Success
+
+	Other
+		Error, see message for details
+
+SEE ALSO
+
+	parmgrep(1)

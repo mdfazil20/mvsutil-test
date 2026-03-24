@@ -1,0 +1,66 @@
+DWHENCE(1)                     ZOAU Command Syntax                    DWHENCE(1)
+
+NAME
+
+	dwhence - Search for a member within a dataset concatenation.
+
+SYNOPSIS
+
+	dwhence [-dhv] <MEMBER> <CONCATENATION>
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print output in JSON format.
+
+	-J
+		Print JSON output in a readable format.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Search for a dataset MEMBER within a dataset CONCATENATION.
+	dwhence supports the generation dataset relative name notation.
+
+EXAMPLES
+
+	Look for dataset member TEST within a dataset concatenation:
+
+		dwhence TEST DATASET.ONE:DATASET.TWO:DATASET.THREE
+
+	Search for member DATA in a dataset concatenation and get JSON output:
+
+		dwhence -J DATA DATASET.ONE:DATASET.TWO:DATASET.THREE
+
+		{
+			"data": {
+					"found": true,
+					"result": "JURIBE.TEST.PDS",
+					"member": "DATA",
+					"search_list": [
+							"DATASET.ONE",
+							"DATASET.TWO",
+							"DATASET.THREE"
+					]
+			},
+			"program": "dwhence",
+			"options": "-J ",
+			"rc": "0"
+		}
+
+EXIT VALUES
+
+	0
+		Success.
+
+	8
+		No matches were found.
+
+	Other
+		Error, see message for details.

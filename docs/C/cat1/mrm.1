@@ -1,0 +1,97 @@
+MRM(1)                         ZOAU Command Syntax                        MRM(1)
+
+NAME
+
+	mrm - Remove partitioned dataset members.
+
+SYNOPSIS
+
+	mrm [-dfhv] <DATASET_PATTERN>[(<MEMBER_PATTERN>)]+
+
+	-d
+		Print out debug messages.
+
+	-f
+		Force member deletion, use with caution!
+		Note: wildcards will delete every matching member, whether or not
+		it is being used.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	The mrm utility removes partitioned dataset members that match
+	MEMBER_PATTERN. If no member pattern is specified, or if a member
+	pattern of * is	specified, all members of the dataset will be removed.
+
+	The partitioned dataset can be specified with wildcards, but only
+	one partitioned dataset can match the pattern, otherwise an error
+	is issued.
+
+	mrm is able to delete the members of a partitioned generation dataset (GDS).
+	GDS relative name notation is supported when not using wildcard characters.
+
+	NOTE:
+	Care should be taken with wildcards to avoid unintentionally deleting
+	dataset members.
+
+	Using the -f option will use DISP=SHR on the whole PDS directory,
+	so extra caution is advised when using wildcards. Changes made after
+	the member has been deleted may create it once again.
+
+EXAMPLES
+
+	Remove all members in dataset IBMUSER.PROJ23.LOAD:
+
+		mrm ibmuser.proj23.load
+
+	Remove members matching "MEM?" from two datasets:
+
+		mrm 'zoauser.pds1(mem?)' 'zoauser.pds2(mem?)'
+
+	Remove all members of IBMUSER.LOAD that start with TST and end with
+	the character '1' followed by one additional character:
+
+		mrm 'ibmuser.load(tst*1?)'
+
+	Remove all members of IBMUSER.PROJ23.LOAD, assuming no other datasets
+	also match the pattern IBMUSER.*23.LOAD:
+
+		mrm 'ibmuser.*23.load(*)'
+
+	Forcibly remove members that are in use:
+
+		mrm -f 'ibmuser.proj23.load(*)'
+
+	Remove all the members of the latest partitioned generation dataset in the
+	generation data group ZOAUSER.GDG:
+
+		mrm 'ZOAUSER.GDG(0)'
+
+EXIT VALUES
+
+	0
+		mrm completed successfully.
+
+	1
+		The dataset specified by DATASET_PATTERN does not exist.
+
+	2
+		The command help text was displayed.
+
+	3
+		A dataset wildcard pattern matched multiple datasets.
+
+	4
+		A syntax error ocurred. Correct the command and resubmit it.
+
+	8
+		An error ocurred. See error messages for details.
+
+SEE ALSO
+
+	drm(1), rm(1), dls(1)

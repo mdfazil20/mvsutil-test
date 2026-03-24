@@ -1,0 +1,292 @@
+DUNZIP(1)                      ZOAU Command Syntax                     DUNZIP(1)
+
+NAME
+
+    dunzip - Unterse and restore datasets from a dzip archive file or dataset.
+
+SYNOPSIS
+
+  	dunzip [OPTIONS] SOURCE [VOLUME]
+
+    Restores datasets from a dzip archive dataset or file. SOURCE can be either
+    a dataset name or a z/OS UNIX file path.
+
+    You can specify some options with either a short or long flag. If an option
+    also requires an argument, you must specify the argument along with your
+    chosen flag type.
+    For example: -e <DATASET_PATTERN> or --exclude=<DATASET_PATTERN>
+
+    --admin
+        Sets the ADMINISTRATOR keyword for the ADRDSSU RESTORE command. Acts as
+        a DFSMSdss storage administrator. For administrators, DFSMSdss
+        bypasses access checking for datasets and catalogs.
+
+    --bypass-acs=<DATASET_NAME>
+        Specifies that Automatic Class Selection (ACS) routines are
+        not to be invoked to determine the target dataset's storage class or
+        management class names. Equivalent to BYPASSACS command keyword.
+
+    -d, --debug
+        Print out debug messages.
+
+    -D, --dataset
+        SOURCE is a dataset name. If omitted, SOURCE is a z/OS UNIX filename.
+
+    -e, --exclude=<DATASET_PATTERN>
+        Specifies the name of a dataset to be excluded from the datasets
+        selected by the INCLUDE keyword. Either a fully or a partially
+        qualified dataset name can be used. Equivalent to EXCLUDE command
+        keyword.
+
+    -h, --help
+        Display syntax help.
+
+    -H, --newhlq=<NEWHLQ>
+        Specifies the high-level-qualifier (HLQ) to use for the restored
+        datasets. If not specified, then the username of the currently
+        logged-in user is used as the HLQ. This argument is ignored if the
+        -N or --no-rename arguments are provided.
+
+    -i, --include=<DATASET_PATTERN>
+        Specifies the name of a dataset eligible to be copied. Either a fully
+        or a partially qualified dataset name can be used. Equivalent to
+        INCLUDE command keyword.
+
+    -I, --import
+        Specifies that the datasets that are being restored were dumped from a
+        different system and should thus be considered new datasets.
+        Equivalent to IMPORT command keyword.
+
+    --keep-temporary-dataset
+        Do not delete the temporary dataset produced by untersing the input
+        archive file or dataset. This can reduce processing time if the
+        dataset is used for multiple dunzip invocations.
+
+        Note that the dataset will need to be manually deleted when no longer
+    needed.
+
+    --keyword=<KEYWORD>
+        Specifies an ADRDSSU RESTORE command keyword. Use quotes to pass special
+        characters, such as parentheses. Use the --keyword argument repeatedly
+        to specify multiple keywords. See the DESCRIPTION section for a link
+        to the ADRDSSU documentation with keyword explanations.
+
+    -m, --management-class=<MANAGEMENT_CLASS>
+        Specifies the user-desired management class that is to replace the
+        source management class as input to the ACS routines. Equivalent to
+        MGMTCLAS command keyword.
+
+    --null-management-class
+        Specifies that the input to the ACS routines is a null management class
+        rather than the source dataset's management class. Equivalent to
+        NULLMGMTCLAS command keyword.
+
+    --null-storage-class
+        Specifies that the input to the ACS routines is to be a null storage
+        class rather than the source dataset's storage class. Equivalent to
+        NULLSTORCLAS command keyword.
+
+    -N, --no-rename
+        Restore datasets to their original HLQ from when they were archived.
+        This overrides any value specified by the -H or --newhlq arguments.
+        Equivalent to RENUNC command keyword.
+
+    -o, --overwrite
+        Overwrite existing datasets with the same name on the target device.
+        Equivalent to REPUNC command keyword.
+
+    -Q, --tmphlq=<TEMP_HLQ>
+        Use an alternative high-level qualifier (HLQ) for the temporary dataset
+        name. This overrides the TMPHLQ environment variable.
+
+    --recatalog=<NEWCATNAME>
+
+        Equivalent to RECATALOG command keyword. If this argument is not
+        specified, then the CATALOG keyword is used instead.
+
+        --recatalog=<NEWCATNAME>
+            Catalogs the target dataset in the NEWCATNAME catalog.
+
+        --recatalog=*
+            Catalogs the target dataset in the same catalog that points to the
+            source dataset. If the source dataset was not cataloged, the new
+            dataset is not cataloged either.
+
+    --rename=(<OLDNAME>,<NEWNAME>)
+        Specifies that, if a dataset with the old name exists on the
+        output DASD volume, DFSMSdss is to allocate a new dataset with the new
+        name and restore the dataset. If the dataset with the old name does
+        not exist on the volume, the dataset is restored with the old name.
+        For a VSAM dataset that already exists on another DASD volume and is
+        cataloged, the VSAM dataset is restored with the new name unless the
+        new name exists and is cataloged.
+
+        Use the --rename argument multiple times to specify multiple rename
+        clauses. Equivalent to RENAME command keyword.
+
+    -s, --size=<SIZE>
+        Specifies how large to allocate datasets.
+        Valid units are: CYL, TRK, K, M, G.
+        Defaults to bytes if no unit is provided.
+
+    -S, --storage-class=<STORAGE_CLASS>
+        Specifies the user-desired storage class that is to replace the source
+        storage class as input to the ACS routines. Equivalent to the
+        STORCLAS command keyword.
+
+    --share
+        Specifies that DFSMSdss is to share, for read access with other
+        programs, the datasets that are to be restored. The resetting of the
+        dataset change indicator is bypassed if share is specified on a data
+        set restore operation. Equivalent to the SHARE command keyword.
+
+    --sphere
+        Specifies that for any VSAM cluster dumped with the SPHERE keyword,
+        DFSMSdss must also restore all associated AIX clusters and paths.
+        Individual sphere component names need not be specified; only the base
+        cluster name is required. Equivalent to the SPHERE keyword.
+
+    -t, --to-volume=<TMPVOL>
+        Specifies a particular volume will be used when temporary datasets are
+        created.
+
+    --target-gds=<STATUS>
+        Restore non pre-allocated SMS-managed generation datasets with the
+        specified status.
+
+        STATUS may be one of the following: active, deferred, source, rolledoff.
+        For a successful restore, the target generation data group (GDG) base
+        must exist.
+
+    --tolerate
+        Specifies that target datasets are processed even though shared
+        or exclusive access fails. Equivalent to the TOLERATE(ENQF) command
+        keyword.
+
+    -T, --dataset-type=<DATASET_TYPE>
+        Specifies the type of dataset used for both the temporary and output
+        datasets. This can be one of the following: LARGE, SEQ.
+        Defaults to SEQ.
+
+    -u, --use-sms-for-temps
+        Specifies the SMS classes listed with the -S and -m arguments are used
+        when creating temporary datasets.
+
+    -v, --verbose
+        Display verbose command information. Prints ADRDSSU restore command.
+
+    -V, --volume
+        Restore volume (default is dataset).
+
+ENVIRONMENT VARIABLES
+
+	TMPHLQ
+        Overrides the current high-level qualifier (HLQ) used for temporary
+        dataset names.
+
+DESCRIPTION
+
+    dunzip uses the ADRDSSU and AMATERSE utilities to unterse and restore
+    datasets from an archive file or dataset created by dzip. Many of the
+    arguments used with dunzip correspond to command keywords provided to
+    ADRDSSU. For detailed explanations of the keywords, see this link:
+
+    https://www.ibm.com/docs/en/zos/latest?topic=dfsmsdss-explanation-restore-command-keywords
+
+USAGE NOTES
+
+    By default dunzip modifies the HLQ of the dataset names restored to the
+    user's HLQ. For example, the dataset OLDUSER.TEST.DS can be changed
+    to NEWUSER.TEST.DS. To restore datasets with the original name, specify
+    the -N or --no-rename argument. To restore datasets with a different HLQ,
+    use the -H or --newhlq argument.
+
+    All dataset and volume names provided to dzip are converted to uppercase.
+
+    If you specify more than the first HLQ segment (such as MY.HLQ), the command
+    exits with an error message.
+
+    If you specify multiple dataset patterns with -e or -i, you must separate
+    them with a space or comma (,).
+
+DATASET PATTERNS
+
+    The following rules apply to <DATASET_PATTERN>.
+
+    Either fully or partially qualified dataset names can be used.
+
+    Use a single asterisk (*) in place of exactly one qualifier.
+    You can also use it to indicate to DFSMSdss that only part of a
+    qualifier has been specified. For example, just the first, last,
+    middle, or first and last parts.
+
+    Using the double asterisk (**) with other qualifiers indicates either the
+    nonexistence of leading, trailing, or middle qualifiers, or the fact that
+    they play no role in the selection process.
+
+    Two asterisks are the maximum permissible in a qualifier.
+    If there are two asterisks in a qualifier, they must be the first and last
+    characters.
+
+    A question mark (?) or percent sign (%) matches a single character.
+
+EXAMPLES
+
+    Restore datasets from dzip file /tmp/zoau/dzp. All datasets are renamed
+    to a new HLQ that matches the one of the current user ID.
+
+        dunzip /tmp/zoau.dzp
+
+    Restore datasets from the dzip file /tmp/zoau.dzp with their original names.
+
+        dunzip --no-rename /tmp/zoau.dzp
+
+    Restore datasets from the dzip file /tmp/zoau.dzp, but if dataset
+    SOURCE.DATA.SET is present on the disk, rename it to SOURCE.NEW.DATA.SET.
+
+        dunzip --rename=SOURCE.DATA.SET,SOURCE.NEW.DATA.SET /tmp/zoau.dzpy
+
+    Restore datasets from the dzip file /tmp/zoau.dzp with a new HLQ of ZOAUSER.
+
+        dunzip --newhlq=ZOAUSER /tmp/zoau.dzp
+
+    Restore datasets from the dzip file /tmp/zoau.dzp onto volume TEST.
+    The target dataset is created with a size of 5MB.
+
+        dunzip -s 5M /tmp/zoau.dzp TEST
+
+    Restore a volume from the dzip file /tmp/volume.dzp onto volume USER10.
+    The volume is created with a size of 20GB.
+
+        dunzip -V -s 20G /tmp/volume.dzp USER10
+
+    Restore datasets from the dzip dataset SOURCE.DATA.SET onto volume USER10.
+    Datasets with the pattern USER.TEST.* are included in the extraction,
+    but the dataset USER.TEST.SOMEDS is excluded.
+
+        dunzip -D -i user.test.* -e user.test.someds source.data.set USER10
+
+    Restore datasets from the dzip file /tmp/zoau2.dzp, overwriting any
+    existing datasets that have the same name. In addition, the FORCE command
+    keyword is passed to ADRDSSU to allow an unmovable dataset or a dataset
+    allocated by absolute track allocation to be moved.
+
+        dunzip --overwrite --keyword="FORCE" /tmp/zoau2.dzp
+
+EXIT VALUES
+
+    0
+        dunzip completed successfully.
+
+    2
+        The help text was printed.
+
+    4
+        There is a syntax error in the dunzip command.
+
+    8
+        An error occurred when dunzip was running.
+
+SEE ALSO
+
+    dzip(1)

@@ -1,0 +1,50 @@
+PDC(1)                         ZOAU Command Syntax                        PDC(1)
+
+NAME
+
+	pdc - Print the currently active SMS data classes.
+
+SYNOPSIS
+
+	pdc [-dhv] [-Q <tmphlq>]
+
+	-d
+		Run in debug mode.
+
+	-h
+		Print this syntax message.
+
+	-Q <tmphlq>
+		Use an alternative high-level qualifier (HLQ) for the temporary dataset
+		name. This will override the TMPHLQ environment variable as well.
+
+	-v
+		Run in verbose mode.
+
+EXIT VALUES
+
+	0
+		Success.
+
+	4
+		Invalid syntax.
+
+	Other
+		Command failed, see error message for details.
+
+ENVIRONMENT VARIABLES
+
+	TMPDIR
+		Overrides the current directory used for temporary files.
+
+	TMPHLQ
+		Overrides the current high-level qualifier for the temporary
+		dataset names.
+
+	ISMF_HLQ
+		Overrides the current high-level qualifier used to reference the ISMF
+		libraries.
+
+	ISPF_HLQ
+		Overrides the current high-level qualifier used to reference the ISPF
+		libraries.

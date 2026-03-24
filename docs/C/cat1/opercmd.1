@@ -1,0 +1,207 @@
+OPERCMD(1)                     ZOAU Command Syntax                    OPERCMD(1)
+
+NAME
+
+	opercmd - Run a specified z/OS operator command and write the response to
+	the terminal.
+
+SYNOPSIS
+
+	opercmd [-dhjJptuvw] [-c CONSOLE] [-T TIMEOUT] OPERATOR-COMMAND
+
+	-c CONSOLE
+		Specifies an optional suffix that will be used when generating the
+		name of the EMCS console that will submit the operator command.
+		The suffix must be an integer between 0-9999. If this argument is
+		omitted, the integer used will be 0000.
+
+		The generated console name consists of the first four characters of
+		the submitting user ID, concatenated with the provided integer.
+		The integer will be left-padded with zeros to be four digits long.
+		For example, if the user ID is "ZOAUSER", the generated console name
+		will be "ZOAU0000".
+
+		This argument may be necessary when running multiple opercmd
+		invocations simultaneously with the same user ID. EMCS console names
+		must be unique.
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print output in JSON format. By default it has this form:
+			{ "data": { "output":"<command output>" }, "meta": {...} }
+		Additional entries for the console and reply ID are included
+		when present.
+		When -d is enabled, it includes entries for date and time,
+		and timeout values.
+
+	-J
+		Prints JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-p
+		Preserve the case of the OPERATOR-COMMAND input. The command is
+		converted to uppercase by default. This is useful for operator commands
+		that specify a case-sensitive z/OS UNIX path.
+
+	-t
+		Provide terse output. Only the command response is printed to the
+		terminal. No effect when JSON output is enabled.
+
+	-T TIMEOUT
+		Specifies the maximum amount of time, in centiseconds (0.01s),
+		to wait for the console command to complete. The specified value must
+		be between 1 and 2147483600. The default value is 100 centiseconds,
+		or 1 second.
+
+		This is the maximum amount of time that opercmd will wait, regardless
+		if any command response output has been received. If the command response
+		is unexpectedly truncated, then the value of this argument should
+		be increased.
+
+		If a timeout of 0 is specified, the default timeout will be used.
+
+	-u
+		Do not convert unprintable characters to spaces.
+
+	-v
+		Print out verbose command information.
+
+	-w
+		Always wait for the amount of time specified by the TIMEOUT argument.
+		The wait will always be for the full period, whether or not any
+		command response output has been received.
+
+DESCRIPTION
+
+	Run a z/OS operator command and write the output to the terminal. The
+	maximum length of the command is 126 characters. Note that many operator
+	commands require higher levels of authority. If you do not have the right
+	level of authority, you will not be able to run the command. Typically you
+	will need to surround the command in quotes to prevent command-line
+	globbing.
+
+	By default, the specified operator command will be converted to uppercase
+	before being submitted. Use the -p (preserve case) argument in order to
+	submit the command exactly as specified.
+
+	Operator commands that begin with dashes (-) may be interpreted as options
+	by `opercmd`. To avoid this, use the double-dash argument (--) to signify
+	the end of the argument list immediately before the operator command. This
+	will indicate the end of the option list and that the following argument is
+	to be processed as an operator command.
+
+	In the event that a console command response contains unprintable
+	characters, they will be replaced by spaces before being printed.
+	Use the -u argument to suppress this replacement.
+
+	opercmd activates an EMCS console to submit the operator command.
+	If the console name is already active, opercmd tries different
+	console names until it finds one that is available. After the command
+	completes, the console is deactivated and deleted.
+
+AUTHORIZATION
+
+	This utility requires authorization to use. The submitting user ID
+	must have READ access to the MVS.MCSOPER.ZOAU profile in the OPERCMD
+	class. Failure to obtain this authority will result in an error message.
+
+ENVIRONMENT VARIABLES
+
+	CONSBUFPGNUM
+		Number of allocated 1024 byte buffer pages to capture the console
+		command output. The default is 128 pages, and the total allocated
+		memory is 128 kB.
+
+NOTES
+
+	If you are issuing a console command that contains a dollar sign ($),
+	you must be sure to either escape it with a backslash (\) or surround the
+	command in single quotes ('). Otherwise the UNIX shell will interpret the
+	command as a shell variable and substitute it for something else.
+
+	For example, to issue the JES command $DSPL, you could run the following
+	command with single quotes:
+
+		opercmd '$dspl'
+
+	You could also escape the dollar sign:
+
+		opercmd "\$dspl"
+
+EXAMPLES
+
+	Display system activity:
+
+		opercmd "d a,all"
+
+	Display IPL information with debug output enabled:
+
+		opercmd -d "d iplinfo"
+
+	Display the system time with a console suffix of 628:
+
+		opercmd -c 628 "d t"
+
+	Display VTAM options and wait the entire timeout period for output:
+
+		opercmd -w "d net,vtamopts"
+
+	Display JES spool utilization and wait 10 csec (0.10 sec) for output.
+	Note that single quotes are used to prevent the UNIX shell from treating
+	the dollar sign as a variable.
+
+		opercmd -w -T 10 '$dspl'
+
+	Display JES2 information using the $D JQ command:
+
+		opercmd "\\\$D JQ'JOBNAME'"
+
+	To get the system time in JSON format:
+
+		opercmd -j "d t"
+		{"Command":"D T","Output":"IEE136I LOCAL: TIME=18.06.54 DATE=2023.131
+		UTC: TIME=22.06.54 DATE=2023.131\n"}
+
+	An additional entry will contain the generated console ID if -c was set:
+
+		opercmd -j -c 628 "d t"
+		{"Command":"D T","Console":"IBMU0623","Output":"IEE136I LOCAL:
+		TIME=18.06.54 DATE=2023.131  UTC: TIME=22.06.54 DATE=2023.131\n"}
+
+	Using debug output with JSON will include entries for timestamp,
+	timeout and console ID:
+
+		opercmd -j -d "d t"
+		{"Timestamp":"2023132  13:13:50.00","Timeout":1,"Command":"D T",
+		"Console":"IBMU0000","Output":"IEE136I LOCAL: TIME=13.13.50
+		DATE=2023.132  UTC: TIME=17.13.50 DATE=2023.132\n"
+
+EXIT VALUES
+
+	0
+		opercmd completed successfully.
+
+	2
+		Syntax error. Correct the opercmd syntax and resubmit the command.
+
+	4
+		Not enough memory to hold the entire command output. Adjust the
+		CONSBUFPGNUM environment variable to a larger value and optionally
+		rerun the command.
+
+	6
+		Unauthorized user. See AUTHORIZATION section on how to grant permission
+		to use opercmd.
+
+	8
+		Invalid argument. One or more of the arguments to opercmd is incorrect.
+		Examine the error message for details and correct the argument value.
+
+	12
+		An error occurred when submitting the console command. Examine the
+		error message for details.

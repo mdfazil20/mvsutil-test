@@ -1,0 +1,40 @@
+MMV(1)                         ZOAU Command Syntax                        MMV(1)
+
+NAME
+
+	mmv - Move (rename) a partitioned dataset member to a new name.
+
+SYNOPSIS
+
+	mmv [-dhv] DATASET OLD_MEM NEW_MEM
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Move (rename) a member in DATASET from name OLD_MEM to NEW_MEM. The member
+	is not copied; it is strictly renamed. This command will not rename datasets.
+	Use the dmv command to rename a dataset.
+
+	mmv supports moving members from partitioned generation datasets by relative
+	or absolute name notation.
+
+EXAMPLES
+
+EXIT VALUES
+
+  	0
+  		mmv ran successfully.
+
+  	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+	mv(1), dmv(1), dcp(1)

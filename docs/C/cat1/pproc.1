@@ -1,0 +1,63 @@
+PPROC(1)                       ZOAU Command Syntax                      PPROC(1)
+
+NAME
+	pproc - Display a PROCLIB concatenation.
+
+SYNOPSIS
+
+	pproc [-adh] [<proclib>]
+
+	-a
+		Display all proclibs.
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+DESCRIPTION
+
+	Displays the various datasets within a proclib concatenation, or all of
+	them if -a is specified.
+	Without the <proclib> argument, it defaults to displaying PROC00 on JES2 
+	and IATPLBST on JES3 systems. A different default name can be defined with
+	the DEFAULT_PROC environment variable.
+
+ENVIRONMENT VARIABLES
+
+	DEFAULT_PROC
+		Overrides the default library name to be used when pproc is called
+		without arguments.
+
+EXAMPLES
+
+	Displays PROC00.
+
+		pproc
+
+	Displays a user-defined default PROC10.
+
+		export DEFAULT_PROC=PROC10
+		pproc
+
+	Displays PROC99.
+
+		pproc PROC99
+
+	Displays PROC00, PROC99, etc.
+
+		pproc -a
+
+EXIT VALUES
+
+	0
+		Success
+
+	Other
+		Error, see message for details
+
+SEE ALSO
+
+	pll(1), pparm(1)
+	

@@ -1,0 +1,57 @@
+JSUB(1)                        ZOAU Command Syntax                       JSUB(1)
+
+NAME
+
+	jsub - Submit a dataset or file containing JCL.
+
+SYNOPSIS
+
+	jsub [-hvdf] <jclpath>
+
+	-d
+		Print out debug messages.
+
+	-f
+		Specifies the JCL path is a UNIX file.
+
+	-h
+		Display syntax help.
+
+	-v
+		Print out verbose command information.
+
+DESCRIPTION
+
+	Submit a UNIX file, dataset, or member containing JCL.
+
+EXAMPLES
+
+	Submit JCL located in PDS dataset member EXAMPLE.JCL(EXAMPLE):
+		jsub "EXAMPLE.JCL(EXAMPLE)"
+
+	Submit JCL located in sequential dataset EXAMPLE.MY.JCL:
+		jsub "EXAMPLE.MY.JCL"
+
+	Submit JCL located in UNIX file myjcl.txt in current directory:
+		jsub -f myjcl.txt
+
+	Submit JCL located in UNIX file myjcl.txt two directories up:
+		jsub -f ../../myjcl.txt
+
+	Submit JCL located at absolute UNIX path /u/myuser/jclfiles/myjcl.txt:
+		jsub -f /u/myuser/jclfiles/myjcl.txt
+
+	Submit JCL through stdin:
+		cat myjcl.txt | jsub
+
+EXIT VALUES
+
+	0
+		jsub successfully applied the command to the dataset.
+
+	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+
+	ddls(1) jcan(1) pjdd(1) jls(1)

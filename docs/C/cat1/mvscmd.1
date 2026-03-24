@@ -1,0 +1,422 @@
+MVSCMD(1)                      ZOAU Command Syntax                     MVSCMD(1)
+
+NAME
+
+	mvscmd - Run an unauthorized MVS command (program) that resides in
+	a PDS or PDSE from the Unix System Services command line.
+	To run an authorized MVS command (program), use mvscmdauth.
+
+SYNOPSIS
+
+	mvscmd [OPTION]*
+
+	Where OPTION is one or more of:
+
+	-a=<args>, --args=<args>
+		The program arguments, such as -a='MARGINS(1,72)'. Default is ''.
+
+	-b, --buildinfo
+		Display build information of this program.
+
+	-d, --debug
+		Display even more verbose messages and retain temporary datasets.
+
+	--<ddname>=<value>,[<options>]*
+		Specify a DDName to associate with a dataset, UNIX file, or volume.
+		Typically, no options are required. Options are ignored for STEPLIB
+		DDNames.
+
+		See DDNAME OPTIONS section for more information.
+
+	-h, --help, --info
+		Display this help message.
+
+	-j, --json
+		Print output in JSON format with the following structure:
+			{
+				"data": {
+					"STEPLIB": "none",
+					"program": "IEBCOPY",
+					"DDs": [
+						{
+							"ddname": "SYSOUT",
+							"type": "console",
+							"name": "IBMUSER.P0000001.T0000001",
+							"retained": false,
+							"content": "sample text\n",
+							"content_length": 12
+						}
+					]
+				},
+				"program": "mvscmd",
+				"rc": "0",
+				"options": "-j --pgm=iefbr14 --sysout=*"
+			}
+
+	-J, --prettyjson
+		Print JSON output in a readable format, with line breaks and
+		indentation.
+
+	-p=<name>, --pgm=<name>
+		Specify the program to run, e.g. -p=iebcopy
+
+	--steplib=<dataset>
+		Specify dataset to search for program. For example: --steplib=MY.DATASET
+		By default, mvscmd searches the STEPLIB linklist for the specified
+		program.
+
+	--tmphlq=<tmphlq> | -Q=<tmphlq>
+		Override the default high-level qualifier (HLQ) used for temporary
+		dataset names, which also overrides the TMPHLQ environment variable if
+		set. The default HLQ is based on the login name of the current user.
+
+	-v, --verbose
+		Display verbose messages.
+
+DDNAME OPTIONS
+
+The following options can be used with the `--ddname` argument.
+
+For datasets:
+
+	excl
+		Allocate this dataset exclusively. If other jobs have
+		allocated this dataset already then the allocation will
+		fail. If the allocation succeeds, no other job can
+		allocate this dataset until this program completes.
+
+	mod
+		Allocate dataset or file for update (modification).
+
+	old
+		Synonym for 'excl'
+
+	vio
+		Allocate the dataset as a virtual I/O DD name, if possible.
+
+	vol
+		Allocate the DD name to a volume. Unlike dataset allocation,
+		the value specified is the volume name.
+
+	volume
+		Synonym for 'vol'
+
+	new
+		Create dataset. Dataset creation default values are the same
+		for mvscmd, mvscmdauth, and dtouch.
+
+		Suboptions for the 'new' operator are as follows:
+
+		blksize
+			The block size of the dataset. Defaults are as follows:
+				32718 for record format FBA,
+				32720 for FB,
+				32743 for VBA,
+				32760 for VB and U.
+
+		conddisp
+			Tells the system what to do with the dataset after
+			abnormal termination of the program.
+			May be one of delete, keep, catalog, uncatalog.
+			Defaults to 'catalog'.
+
+		dataclas
+			The data class for an SMS-managed dataset. Optional for
+			SMS-managed datasets that do not match an SMS-rule.
+			Not valid for datasets that are not SMS-managed.
+			Note that all non-linear VSAM datasets are SMS-managed.
+
+		dirblks
+			The number of directory blocks for a PDS. Optional
+			parameter for PDS datasets. Default is 5.
+
+		dskeylbl
+			The label for the encryption key used by the system to
+			encrypt the dataset. Only applicable when using
+			encrypted datasets.
+
+		dsorg
+			The dataset organization of the dataset. May be one
+			of GS, PS, PSU, PO, POU, DA, DAU, IS, ISU.
+			Defaults are as follows:
+				PS for sequential datasets (SEQ/BASIC/LARGE),
+				PO for partitioned datasets (PDS/PDSE/LIBRARY).
+
+		keylab1
+			The label for the key encrypting key used by the
+			Encryption Key Manager. Only applicable when using
+			encrypted datasets.
+
+		keylab2
+			The label for the key encrypting key used by the
+			Encryption Key Manager. Only applicable when using
+			encrypted datasets.
+
+		keycd1
+			How the label for the key encrypting key specified by
+			keylab1 is encoded by the Encryption Key Manager.
+			May be one of: L, H
+			Only applicable when using encrypted datasets.
+
+		keycd2
+			How the label for the key encrypting key specified by
+			keylab2 is encoded by the Encryption Key Manager.
+			May be one of: L, H
+			Only applicable when using encrypted datasets.
+
+		keylen
+			Length, in bytes, for each record's key in
+			Key Sequenced Datasets (KSDS).
+
+		keyoffset
+			Bytes from the beginning of each record where the key is located.
+			Required for Key Sequenced Datasets (KSDS).
+
+		lrecl
+			Logical record length, in bytes, of each record in the dataset.
+			Expressed in bytes. Defaults are as follows:
+				80 for fixed datasets (FB, FBA),
+				137 for variable datasets (VB, VBA)
+				0 for unformatted datasets (U)
+
+				For variable datasets, the length must include the
+				4-byte prefix area.
+
+		mgmtclas
+			The management class for an SMS-managed dataset.
+			Optional for SMS-managed datasets that do not match an
+			SMS-rule. Not valid for datasets that are not
+			SMS-managed. Note that all non-linear VSAM datasets are
+			SMS-managed.
+
+		normdisp
+			Tells the system what to do with the dataset after normal
+			termination of the program.
+			May be one of delete, keep, catalog, uncatalog.
+			Defaults to 'catalog'.
+
+		primary
+			Is the amount of primary space to allocate for the dataset.
+			Default is 5M.
+			Size may include a suffix of K or KB (kilobytes),
+			M or MB (megabytes), G or GB (gigabytes),
+			C or CYL (cylinders), T or TRK (tracks).
+
+		recfm
+			The record format for the dataset.
+			One of FB, VB, FBA, VBA, U. Default is 'FB'.
+
+		secondary
+			The amount of secondary space to allocate for the dataset.
+			Size of extents. Defaults to 1/10 of primary space amount.
+			Size may include a suffix of K or KB (kilobytes),
+			M or MB (megabytes), G or GB (gigabytes),
+			C or CYL (cylinders), T or TRK (tracks).
+
+		spfrm
+			The format of allocated space to use when allocating the
+			dataset. May be one of:
+				ALX
+					Different areas of contiguous space are to be
+					allocated.
+
+				CONTIG
+					Space must be contiguous.
+
+				MXIG
+					Maximum contiguous space is required.
+
+		storclas
+			The storage class for an SMS-managed dataset.
+			Required for SMS-managed datasets that do not match an
+			SMS-rule. Not valid for datasets that are not
+			SMS-managed. Note that all non-linear VSAM datasets are
+			SMS-managed.
+
+		type
+			May be one of: KSDS, ESDS, RRDS, LDS, SEQ/BASIC, LARGE,
+			PDS, PDSE/LIBRARY, HFS.
+			Default is 'PDSE'.
+			For types with multiple names (SEQ/BASIC, PDSE/LIBRARY),
+
+		unit
+			Unit name of the device that the dataset will reside on.
+			Specifies a device group esoteric name, a generic device
+			type, or a specific device number. If you target a specific
+			device number, you must precede the device address with a
+			slash (/) character.
+
+		volumes
+			A list of comma separated volume serials. When
+			providing multiple volumes, processing will begin with
+			the first volume in the provided list. Offline volumes
+			are not considered. Volumes can always be provided when
+			not using SMS. When using SMS, volumes can be provided
+			when the storage class being used has
+			GUARANTEED_SPACE=YES specified. Otherwise, the
+			allocation will fail.
+
+	raw
+		Equivalent to the 'new' suboption for new dataset definitions, but
+		without using mvscmd default attributes. Use this for cases where
+		the called MVS program is able to assign its own default dataset
+		attributes.
+
+For UNIX files:
+
+	blksize
+		Use the specified block size for the UNIX file being allocated.
+		This is necessary because UNIX files are normally treated as a
+		stream of bytes.
+
+	conddisp
+		Tells the system what to do with the UNIX file after abnormal
+		termination of the program.
+		May be 'keep' or 'delete'. Defaults to 'keep'.
+
+	filedata
+		The type of data that is (or will be) stored in the UNIX file.
+		May be 'binary', 'record', or 'text'.
+
+	lrecl
+		Use the specified logical record length for the UNIX file being
+		allocated. This is required in situations where the data is
+		processed as records.
+		The record length, block size and record format need to be supplied
+		because UNIX files are normally treated as a stream of bytes.
+
+	normdisp
+		Tells the system what to do with the UNIX file after normal
+		termination of the program.
+		May be 'keep' or 'delete'. Defaults to 'keep'.
+
+	pathmode
+		The file access attributes for the UNIX file being allocated.
+		Provide in chmod-like number format. (e.g. 0644, 1777)
+		If missing leading number assumes 0 (e.g. 644 == 0644)
+
+	recfm
+		Use the specified record format for the UNIX file being allocated.
+		This is necessary because a UNIX file is normally be treated as a
+		stream of bytes.
+
+	statusgroup
+		The status for UNIX file being allocated.
+		Specify up to 6 of: OCREAT, OEXCL, OAPPEND, ORDWR, ORDONLY,
+		OWRONLY, ONOCTTY, ONONBLOCK, OSYNC, OTRUNC.
+		Provide multiple attributes as comma separated list.
+
+ENVIRONMENT VARIABLES
+
+	TMPHLQ
+		Overrides the current high-level qualifier used for temporary
+		dataset names.
+
+DESCRIPTION
+
+	mvscmd runs an unauthorized MVS program in the current shell. This is
+	analogous to a job step in JCL.
+
+	In addition, mvscmd lets you read input from stdin and write output
+	to stdout, which is very convenient for running mvscmd as part of a
+	series of steps.
+
+	By default, mvscmd searches for the program (--pgm=<name>) in the linklist
+	defined by the STEPLIB environment variable. However, if you want to add
+	a specific dataset to search for the program, you can use
+	--steplib=MY.DATASET to append this dataset to STEPLIB for this command.
+	Users can display the list of datasets currently contained in STEPLIB by
+	by running the pll utility,
+
+	mvscmd is identical to mvscmdauth except that it runs unauthorized MVS
+	programs instead of authorized MVS programs. For more details, see
+	mvscmdauth.
+
+EXAMPLES
+
+	Dataset example:
+		Allocate the DDName SYSIN to the dataset IBMUSER.TEST.OBJ
+
+		--sysin=IBMUSER.TEST.OBJ
+
+	Concatenated dataset example:
+		Allocate the ddname SYSLIB to the dataset concatenation
+		CEE.SCEELKED:CEE.SCEELKEX.
+
+		--syslib=CEE.SCEELKED:CEE.SCEELKEX
+
+	Concatenated dataset and path example:
+		Allocate the ddname SYSLIB to the dataset and UNIX path concatenation
+		CEE.SCEELKED:/u/sysadm/sysfile.
+
+		--syslib=CEE.SCEELKED:/u/sysadm/sysfile
+
+	Concatenated dataset example allocating second dataset:
+		Allocate the ddname SYSLIB to the dataset concatenation
+		MVSCMD.DSN1:MVSCMD.DS2 where MVSCMD.DS2 is created.
+
+		--syslib=MVSCMD.DSN1:MVSCMD.DS2,NEW,TYPE=SEQ,LRECL=80
+
+	Console example:
+		allocate the DDName SYSPRINT to stdout (which can then be piped to
+		other processes).
+
+		--sysprint=*
+
+	Console example (alternate):
+		--sysprint=stdout
+
+	stdin example:
+		Allocate the DDName SYSIN to an FB 80 temporary sequential dataset that
+		has stdin written to it (stdin can be piped in from other processes):
+
+		--sysin=stdin
+
+	Dummy Dataset example:
+		allocate the DDName SYSIN to DUMMY:
+		--sysin=dummy:
+
+	Dataset allocated as 'exclusive' (i.e. DISP=OLD) example:
+		--archive=IBMUSER.MVSCMD.DAR,EXCL
+
+	Dataset allocated as 'mod' (i.e. DISP=MOD) example:
+		--archive=IBMUSER.MVSCMD.DAR,MOD
+
+	Dataset allocated as 'new' (i.e. DISP=NEW) example:
+		--archive=IBMUSER.MVSCMD.DAR,NEW,TYPE=pdse,LRECL=80,BLKSIZE=32720,
+				VOLUMES=SCR03,MYVOL1
+
+	UNIX file allocated as 'mod' (i.e. DISP=MOD or 'append') example:
+		--archive=/tmp/mylog,mod
+
+	Volume example:
+		Allocate the DDname DD2 to the VOLUME USER01 (as opposed to a
+		particular dataset):
+
+		--dd2=user01,vol:
+
+	mvscmd invocation example:
+		Compare 2 PDS members 'old' and 'new' and write the output to stdout:
+
+		echo "   CMPCOLM 1:72" | mvscmd --pgm=isrsupc --args="DELTAL,LINECMP"
+										--newdd='ibmuser.in(new)'
+										--olddd='ibmuser.in(old)'
+										--sysin=stdin --outdd=stdout
+
+	Specify program location:
+		Specify a certain dataset to search for a particular program example:
+
+		mvscmd --pgm=<name> --steplib=MY.DATASET
+
+EXIT VALUES
+
+	0
+		mvscmd completed successfully.
+
+	non-zero
+		mvscmd failed or the MVS command (program) returned a non-zero value.
+		See error messages for details.
+
+SEE ALSO
+
+	mvscmdauth(1), pll(1)

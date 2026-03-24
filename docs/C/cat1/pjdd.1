@@ -1,0 +1,126 @@
+PJDD(1)                        ZOAU Command Syntax                       PJDD(1)
+
+NAME
+
+	pjdd - Print the output for a given job ID and ddname.
+
+SYNOPSIS
+
+	pjdd [-dhijJv] <JOB_ID> <STEP_NAME> <PROC_NAME>
+	pjdd [-dhijJv] <JOB_ID> <DDNAME|DSID>
+
+	-d
+		Print debug information.
+
+	-h
+		Display syntax help.
+
+	-i
+		Allows pjdd to read SYSIN datasets.
+		Without this option all SYSIN datasets are ignored.
+		This option is automatically set when reading a single dataset.
+
+	-j
+		Print output in JSON format in this form:
+			{ "data": { "content":{...} }, "options": "...", ... }
+
+	-J
+		Prints JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-v
+		Print verbose information.
+
+DESCRIPTION
+
+	Print the output for a given job ID and DD names.
+
+	Use ddls to list the available steps, DD names, and IDs to use as filters
+	for pjdd. If there are multiple datasets under the given <STEP_NAME>
+	or <PROC_NAME>, they are printed in ascending ID order.
+	When <DDNAME> or <DSID> is specified, only output from that
+	dataset is printed.
+
+	pjdd can print records from multiple datasets, including SYSIN and system
+	datasets when the filters allow it.
+
+	<JOB_ID>    is a job id.
+	<STEP_NAME> is the job step of the DD name.
+	<PROC_NAME> is the proc step of the DD name.
+	<DDNAME>    is the DD name allocated to that job to print.
+	<DSID>      is the dataset ID of the DD name.
+
+	pjdd can show the contents of some SYSIN datasets when -i is enabled.
+	On JES2 systems, EVENTLOG output is parsed to show step information in
+	the following format:
+
+	<STEP_NUM> <STEP_NAME> <PROG_NAME> <SUBSTEP_NUM> <PROC_STEP> <EXEC_NAME> <CPU_TIME> <SRB_TIME>
+
+	<STEP_NUM> Step number (starting at 1).
+	<STEP_NAME> Step name (from the EXEC card).
+	<PROG_NAME> Program name (from PGM= parameter on EXEC card).
+	<SUBSTEP_NUM> Substep number (zero for non-z/OS UNIX steps).
+	<PROC_STEP> The name of the step that invoked the procedure.
+	<EXEC_NAME> z/OS UNIX or MVS Program name.
+	<CPU_TIME> CPU time used by the step in microseconds.
+	<SRB_TIME> Service request block (SRB) time used by the step in microseconds.
+
+		Note: blank fields are replaced with '-'.
+
+	Notes
+		- <STEP_NAME>, <PROC_NAME> and <DDNAME> can be wildcards '*' or ''
+		  to match all cases.
+		- You must provide <STEP_NAME> if <PROC_NAME> is specified, even if
+		  passed as ''.
+		- If a DD is empty, the "content" object in JSON output contains a
+		  single space.
+		- The special behavior for the EVENTLOG DD is only available in
+		  systems running JES2. JES3 does not create this type of dataset.
+
+EXAMPLES
+
+	Print the expanded JCL running for job ID STC02621:
+
+		pjdd stc02621 jes2 jesjcl
+
+	Output STEP2 of a STEPA for job ID JOB09212:
+
+		pjdd JOB09212 STEPA STEP2 OUTDD
+
+	Output STEP2 of a STEPA for job ID JOB09212:
+
+		pjdd JOB09212 '*' STEP2 OUTDD
+
+	Output SYSPRINT for job ID JOB00767:
+
+		pjdd JOB00767 sysprint
+
+	Print all DD contents for JOB00767, except for SYSIN datasets:
+
+		pjdd JOB00767 '*'
+
+	Print all DD contents for JOB00767 where STEP_NAME is CREATE, not including SYSIN datasets:
+
+		pjdd JOB00767 create '*'
+
+	Print the DD with dsid 103 for job JOB00767:
+
+		pjdd JOB00767 103
+
+	Print contents of the EVENTLOG for job JOB00767 in a JES2 system:
+
+		pjdd -i JOB00767 EVENTLOG
+		pjdd -i JOB00767 8
+
+
+EXIT VALUES
+
+	0
+		Success
+
+	non-zero
+		Error, see message for details
+
+SEE ALSO
+
+	ddls(1) jsub(1) jcan(1) jls(1)

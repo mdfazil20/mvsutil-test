@@ -1,0 +1,163 @@
+VF(1)                          ZOAU Command Syntax                         VF(1)
+
+NAME
+
+	vf - Print information about active Direct Access Storage Devices.
+
+SYNOPSIS
+
+	vf [-dhjJUv] [VOLSER]
+
+	-d
+		Print out debug messages.
+
+	-h
+		Display syntax help.
+
+	-j
+		Print output in JSON format.
+
+	-J
+		Prints formatted JSON output.
+		This option forces -j if it was not set.
+
+	-U
+		Print available and total space in 'human-readable' format, such as
+		1.1K, 42M, or 123G, where 1K = 1024 bytes.
+
+	-v
+		Print out verbose information.
+
+DESCRIPTION
+
+	List space and status information for all active DASD volumes,
+	or a single volume serial if VOLSER is specified.
+	Free and total space is calculated using the constants for a 3390 device.
+
+	Output has the following fields:
+		<unit> <volser> <available> <total> <percentage used> <status> <flags> <free tracks> <total tracks>
+
+	<unit>
+		Four character device number.
+
+	<volser>
+		Serial number of the volume.
+
+	<available>
+		Available volume space, in kilobytes. 
+
+	<total>
+		Total volume space, in kilobytes. 
+
+	<percentage used>
+		Volume space in use, as a percentage.
+
+	<status>
+		Hexadecimal representation of the status bytes that correspond to
+		"UCBSTAT" in the Unit Control Block (UCB).
+		Device status flags:
+		 - UCBONLI (0x80) Device is online.
+		 - UCBCHGS (0x40) Device status is set to change from online to offline,
+		   and either allocation is enqueued on devices or the device is 
+		   allocated. (Bit UCBONLI is also on.)
+		 - UCBRESV (0x20) The mount status of the volume on this device
+		   is reserved.
+		 - UCBUNLD (0x10) Unload operator command has been addressed to
+		   this device. The device is not unloaded yet.
+		 - UCBALOC (0x08) Device is allocated. For auto-switchable devices,
+		   this bit indicates that the device was allocated by some system
+		   in the SYSPLEX at the time that allocation last obtained the
+		   SYSPLEX allocation status.
+		 - UCBPRES (0x04) The volume is permanently resident on this device.
+		 - UCBSYSR (0x02) System residence device, primary console, or
+		   active console.
+		 - UCBDADI (0x01) Standard tape labels have been verified for this
+		   tape volume or secondary console or console status changing.
+	
+	<flags>
+		Additional information flags in this order:
+		 - "t" or "c": Indicates the volume space information shows track or cylinder managed space.
+		 - "e": Index exists for VTOC, "-" otherwise.
+		 - "a": Index VTOC active, "-" otherwise.
+
+	<free tracks>
+		Number of free tracks.
+
+	<total tracks>
+		Number of total tracks.
+
+	JSON output has this structure:
+		{ 
+		"data": {
+			"volumes": [
+				{
+					"unit": <string>,
+					"volser": <string>,
+					"status": {
+						"UCBONLI": <boolean>,
+						"UCBCHGS": <boolean>,
+						"UCBRESV": <boolean>,
+						"UCBUNLD": <boolean>,
+						"UCBALOC": <boolean>,
+						"UCBPRES": <boolean>,
+						"UCBSYSR": <boolean>,
+						"UCBDADI": <boolean>
+					},
+					"is_cylinder_managed": <boolean>,
+					"index_vtoc": <boolean>,
+					"vtoc_active": <boolean>,
+					"free_space": <string>,
+					"total_space": <string>,
+					"free_kilobytes": <number>,
+					"total_kilobytes": <number>,
+					"percentage_used": <number>,
+					"free_tracks": <number>,
+					"total_tracks": <number>,
+				},
+				{ ... }
+			],
+			"errors": [
+				{
+					"unit": <string>,
+					"volser": <string>,
+					"status": { ... },
+					"LSPACE_message": <string>
+				},
+				{ ... }
+			],
+			},
+		"volumes_reported": <number>,
+		"errors_encountered": <number>
+		}
+
+EXAMPLES
+
+	Display all available information for active volumes, with formatted space values:
+
+		vf -U
+
+	Display information only for volume serial 'VOL123':
+
+		vf VOL123
+
+	Print a JSON string with information for all volumes:
+
+		vf -j
+
+	List and sort all volumes by space used, in descending order:
+
+		vf | sort -k 5 -r
+
+EXIT VALUES
+
+	0
+		vf completed successfully.
+
+	2
+		Syntax error. Correct the vf syntax and resubmit the command.
+
+	4
+		Bad option or argument specified.
+
+	8
+		Error occurred. See error messages for details.

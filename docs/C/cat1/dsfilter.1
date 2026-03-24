@@ -1,0 +1,58 @@
+DSFILTER(1)                    ZOAU Command Syntax                   DSFILTER(1)
+
+NAME
+
+	dsfilter - Filter output from LISTCAT command (via stdin)
+
+SYNOPSIS
+
+	dsfilter [-dhv]
+
+	-d
+		Print debug information.
+
+	-h
+		Print syntax information.
+
+	-v
+		Print verbose information.
+
+
+DESCRIPTION
+
+	This command is intended as a 'helper' script for other commands.
+
+	dsfilter takes raw output from the LISTCAT command output and writes
+	out information in the form:
+		<type> <name> <volume>
+	where <type> indicates the type of dataset being listed, and volume
+	is the volume the dataset resides on (if the dataset is on multiple
+	volumes, the volume displayed will be the first volume).
+	If the dataset is migrated, the volume will show as MIGRAT.
+
+	<type> may be:
+		CATALOG:   the dataset is a catalog
+		PAGESPACE: the dataset is a pagespace
+		NONVSAM:   the dataset is sequential or partitioned
+		CLUSTER:   the dataset is a VSAM cluster
+		DATA:      the dataset is a VSAM DATA dataset
+		INDEX:     the dataset is a VSAM INDEX dataset
+		ALIAS:     the dataset is an alias of another dataset
+		GDGBASER:  the dataset is a GDG base dataset
+		AIX:       the dataset is an AIX dataset
+
+EXAMPLES
+
+	See dlsraw for usage.
+
+EXIT VALUES
+
+	0
+		Processing completed normally
+
+	other
+		Error occurred. See error messages for details.
+
+SEE ALSO
+
+	dlsraw(1)

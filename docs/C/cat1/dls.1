@@ -1,0 +1,256 @@
+DLS(1)                         ZOAU Command Syntax                        DLS(1)
+
+NAME
+
+	dls - List datasets that match a pattern. These can be non-VSAM datasets,
+	generation datasets (GDS), generation data groups (GDG), and VSAM datasets.
+
+SYNOPSIS
+
+	dls [-abBdFhiHjJlmpqsStTuUv] [-V <VOLSER>] [<DATASET_PATTERN>]+
+
+	-a
+		List members and member aliases.
+
+	-b
+		List dataset block size along with detailed information.
+
+	-B
+		List used and maximum directory blocks.
+
+	-d, --debug
+		Print out debug messages.
+
+	-F
+		Display the catalog entry type identifier.
+		Must be used with the -t option.
+
+	-H, --header
+		Display a header for extended listings.
+
+	-h, --help
+		Display syntax help.
+
+	-i
+		List VSAM integrity attributes along with detailed information.
+
+	-j, --json
+		Print the output in JSON format, instead of a list.
+		JSON output is enabled when detailed information is
+		requested with one of the -blsu options.
+
+	-J, --prettyjson
+		Prints JSON output in a readable format.
+		This option forces -j if it was not set.
+
+	-l
+		Display detailed information based on the dataset type.
+
+	--list-volser
+		Display the volume serial for non-VSAM datasets.
+
+	-m
+		List migrated datasets.
+
+	-p
+		List VSAM performance attributes along with detailed information.
+
+	-q, --quiet
+		Enable quiet mode, which suppresses all terminal output. The exit value
+		is still set.
+
+	-s
+		Include the estimated used space (bytes), allocated size (bytes),
+		number of allocated extents, first extent size (bytes), and secondary
+		space (bytes).
+
+		This information is the space that a dataset occupies in a particular
+		volume. A multi-volume dataset will have a different amount of allocated
+		space for each of the volumes it resides on.
+
+		These values are estimated using a 3390 device as a reference, and a
+		conversion from tracks to bytes.
+
+	-S
+		Include the dataset statistics.
+
+	-T
+		Include the dataset type.
+
+	-t <TYPE>
+		Only display information for the specified catalog entry type.
+		TYPE may be one of the following:
+		AIX, ALIAS, CLUSTER, GDG, GDS, NONVSAM, PATH, or VSAM
+
+	-u
+		List last reference (usage) time along with detailed information.
+
+	-U
+		Display dataset sizes in "human-readable" format, such as 1.1K,
+		42M, or 123G, where 1K = 1024 bytes.
+
+	-v, --verbose
+		Print verbose information.
+
+	-V <VOLSER>
+		Only display datasets that are on volume VOLSER.
+
+DESCRIPTION
+
+	dls lists the cataloged datasets that match the specified pattern and writes
+	them to stdout.
+
+	Multi-volume data sets produce a line of output for each utilized volume
+	when -b, -F, -l, -s, or -u are specified. If the dataset is SMS-managed,
+	an asterisk (*) can be present in the volume field instead of a VOLSER. This
+	value represents a candidate volume.
+
+	When the -a option is provided, dls prints a list of members and their
+	aliases for partitioned non-VSAM datasets. dls lists aliases that are
+	equal to or less than eight characters long.
+
+	When the -t option is omitted, dls outputs non-VSAM dataset and generation
+	dataset information by default. The supported entry types are:
+
+		* AIX for alternate indexes. (Unrelated to the IBM AIX operating system)
+		* ALIAS for non-VSAM dataset aliases.
+		* CLUSTER for VSAM clusters and components.
+		* GDG for generation data groups.
+		* GDS for generation datasets.
+		* NONVSAM for non-VSAM datasets.
+		* PATH for VSAM paths.
+		* VSAM for VSAM clusters including their components.
+
+		When the -t VSAM option is specified, the VSAM components are grouped
+		under the name of the cluster, even if the component names do not match
+		the provided pattern.
+
+		Use the -t CLUSTER option to list each VSAM entry (base cluster, data
+		component or index component) individually. The extended listing options
+		are ignored with this filter.
+
+	When you specify the -F option, the catalog type is represented by a single
+	character:
+
+		* A for non-VSAM datasets
+		* B for generation data groups
+		* C for VSAM clusters
+		* D for VSAM data components
+		* G for VSAM alternate indexes
+		* H for generation datasets
+		* I for VSAM index components
+		* R for VSAM paths
+		X for non-VSAM dataset aliases
+
+	When you request detailed information, output is determined by the
+	dataset type:
+
+		* For non-VSAM datasets, generation datasets, and dataset aliases:
+			* recfm 	Record format
+			* lrecl		Logical record length
+			* dsorg		Dataset organization
+			* volume	Volume serial
+
+		* For generation data groups:
+			* limit		GDG limit
+			* scratch	SCRATCH | NOSCRATCH attribute
+			* empty		EMPTY | NOEMPTY attribute
+			* order		LIFO | FIFO attribute
+			* purge		PURGE | NOPURGE attribute
+			* erase		ERASE | NOERASE attribute
+
+		* For VSAM components (when requested with the -t VSAM option):
+			* org 		Data organization
+			* klen 		Key length
+			* rkp 		Relative key position
+			* avglrecl	Average LRECL
+			* maxlrecl 	Maximum LRECL
+			* bufspace	Buffer space
+			* reuse		REUSE | NOREUSE attribute
+
+	The -i option lists the basic VSAM attributes and the following fields:
+		* shropts	Share options
+		* erase		ERASE | NOERASE attribute
+
+	The -p option lists the basic VSAM attributes and the following fields:
+		* cisize	Control interval size
+		* spanned	SPANNED | NOSPANNED attribute
+		* speed/rec	SPEED | RECOVERY attribute
+
+	The -S option displays dataset statistics. The output is determined by the
+	dataset type.
+
+	 For VSAM components (when requested with the -t VSAM option):
+		* rec-tot       Total records
+		* rec-del       Deleted records
+		* rec-ins       Inserted records
+		* rec-upd       Updated records
+		* rec-ret       Retrieved records
+		* splits-ci     Control interval splits
+		* splits-ca     Control area splits
+		* freespc-%ci   Percentage of space to be left free in CI.
+		* freespc-%ca   Percentage of CIs to be left free in a CA.
+		* freespc       Bytes of free space in the total allocated amount.
+
+	Specify -m to show migrated datasets. -m cannot be used with options -b,
+	-l, -s, or -u.
+
+	When JSON output is requested, the response has the following form:
+
+		{ "datasets": [], "gdgs": [], "vsams": [] }
+
+	The "datasets" array contains non-VSAM and GDS metadata.
+	The "gdgs" array contains GDG metadata.
+	The "vsams" array contains the metadata of VSAM clusters and components.
+
+DATASET PATTERNS
+
+	The following rules apply to <DATASET_PATTERN>.
+
+	The high-level-qualifier (HLQ) must be specified in full.
+	An asterisk (*) matches any sequence of characters.
+	A question mark (?) matches a single character.
+
+EXAMPLES
+
+	List all non-VSAM datasets under your default high-level-qualifier:
+
+		dls -l "`hlq`.*"
+
+	Get a JSON object with detailed information for datasets
+	under your high-level-qualifier:
+
+		dls -j -bsu "$(hlq).*"
+
+	List all non-VSAM datasets that have an HLQ of TEST followed by TSTR
+	and then exactly 3 characters, with a low level qualifier of JCL:
+
+		dls -l 'test.tstr???.*.jcl'
+
+	Test whether a dataset exists:
+
+		dls -q ${prefix}.my.jcl
+		if [ $? -eq 0 ]; then
+			# dataset match
+		fi
+
+	List all the non-VSAM datasets that match the pattern TEST.**.X*
+	and volume VOLSER:
+
+		dls -l -V VOLSER TEST.**.X*
+
+EXIT VALUES
+
+	0
+		At least one dataset was found matching a <dataset-pattern>
+
+	1
+		No datasets were found.
+
+	other
+  		Error in dataset listing. See error messages for details.
+
+SEE ALSO
+
+	ls(1) dinfo(1) dcp(1) drm(1) dtouch(1) dls(1) decho(1) ddiff(1)
+	dgrep(1) dsed(1) mrm(1) mls(1) dlsraw(1)
