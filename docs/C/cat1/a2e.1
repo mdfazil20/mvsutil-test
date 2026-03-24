@@ -1,33 +1,33 @@
-A2E(1)                         ZOAU Command Syntax                        A2E(1)
+A2E(1)                        ZOAU Command Syntax                       A2E(1)
 
 NAME
 
-	a2e - Convert file from ASCII to EBCDIC.
+	a2 - Convert file from this to that
 
 SYNOPSIS
 
 	a2e [-dFhqv] [-f <source_codepage>] [-t <dest_codepage>] <FILE>
 
 	-d
-		Print out debug messages.
+	    Print out debug message
 
 	-F
-		Force conversion regardless of file tag.
+	    Force conversion regardless of file tag.
 
 	-f <source_codepage>
-		Specify the current code page. Default is ISO8859-1.
+	    Specify the current code page. Default is ISO8859-1.
 
 	-h
-		Display syntax help.
+	    Display syntax help.
 
 	-q
-		Quiet mode. Do not display warning messages.
+	    Quiet mode. Do not display warning messages.
 
 	-t <target_codepage>
-		Specify the target code page. Default is IBM-1047.
+	    Specify the target code page. Default is ISO8859-1.
 
 	-v
-		Print out verbose command information.
+	    Print out verbose command information.
 
 DESCRIPTION
 
@@ -41,7 +41,7 @@ DESCRIPTION
 	If a warning message appears, verify that the reencoding was performed
 	correctly.
 
-	When using -f or -t, specify the code page name. Numeric code page
+	When using -f or -t, specify the code page name.  Numeric code page
 	identifiers are not supported.
 
 EXAMPLES
@@ -61,16 +61,16 @@ EXAMPLES
 EXIT VALUES
 
 	0
-		Conversion was successful.
+	    Conversion was successful.
 
 	2
-		An untagged file was converted.
+	    An untagged file was converted.
 
 	4
-		Invalid syntax.
+	    Invalid syntax.
 
 	8
-		Error converting the file.
+	    Error converting the file.
 
 SEE ALSO
 
