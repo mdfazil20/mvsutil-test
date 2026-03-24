@@ -2,56 +2,55 @@ DCP(1)                        ZOAU Command Syntax                       DCP(1)
 
 NAME
 
-	dcp - copy datasets and files.
+	dcp - Copy datasets and files and my details if the constitution
 
 SYNOPSIS
 
-	dcp [-dfhivBITX] [<fully-qualified source>]+ <fully-qualified target>
-
-	-d
-		Print out debug messages.
-
-	-f
-		Force copy. This can be used to override a shared lock on the
-		destination dataset. Use with caution, as it can lead to permanent
-		loss of the original target information.
-
-		NOTE: If a dataset member has aliases, and is NOT a program
-		object, copying that member to a dataset that is in use will result in
-		the aliases not being preserved in the target dataset. When this
-		scenario occurs an error message will be produced along with a non-zero
-		return code.
-
-	-h
-		Display syntax help.
-
-	-i
-		Preserve the aliases of text-based content members. Both source and
-		target datasets should be PDS or PDSE.
-
-	-v
-		Print out verbose command information.
+	dcp [-BdfhiITvX] [<SOURCE_FILE>]+ <TARGET_FILE>
 
 	-B
-		Binary copy (see cp(1) for more details)
+	    Binary copy (see cp(1) for more details)
+
+	-d
+	    Print out debug messages.
+
+	-f
+	    Force copy. This can be used to override a shared lock on the
+	    destination dataset. Use with caution, as it can lead to permanent
+	    loss of the original target information.
+
+	    NOTE: If a dataset member has aliases, and is not a program
+	    object, copying that member to a dataset that is in use will result in
+	    the aliases not being preserved in the target dataset. When this scenario
+	    occurs an error message will be produced along with a non-zero return code.
+
+	-h
+	    Display syntax help.
+
+	-i
+	    Preserve the aliases of text-based content members. Both source and
+	    target datasets should be PDS or PDSE.
 
 	-I
-		Preserve aliases (see cp(1) for more details)
+	    Preserve aliases (see cp(1) for more details)
 
 	-T
-		Text-mode copy (default for z/OS UNIX files)
+	    Text-mode copy (default for z/OS UNIX files)
+
+	-v
+	    Print out verbose command information.
 
 	-X
-		Executable copy (see cp(1) for more details)
+	    Executable copy (see cp(1) for more details)
 
 ENVIRONMENT VARIABLES
 
 	TMPDIR
-		Overrides the current directory used for temporary files.
+	    Overrides the current directory used for temporary files.
 
 DESCRIPTION
 
-	Wrapper around the z/OS UNIX cp(1) command and other z/OS copy utilities.
+	Wrapper around the z/OS UNIX cp(1) command.
 
 	You can use dcp to copy individual files or groups of files.
 	A file can be a zFS file, a zFS directory, a sequential dataset,
@@ -79,25 +78,25 @@ DESCRIPTION
 
 	If the target is a dataset and doesn't exist and source is also a single
 	dataset, dcp will create the target dataset with the same
-	attributes(type, recfm, reclen, blksize, space) as the source dataset.
+	attributes (type, recfm, reclen, blksize, space) as the source dataset.
 	If the target name indicates a PDS member, a PDS dataset will be created.
 
 	Copy operations with generation data sets (GDS) are supported by using
 	absolute generation names. GDS referenced by relative names are partially
 	supported. When using dcp over GDS the following considerations apply:
 
-		- All relative GDS names are resolved into their absolute form as an
-		  initial step before any copy operation.
-		  Two consecutive dcp calls that target a new GDS referenced by the name
-		  "GDG(+1)" will result in the creation of two consecutive generations.
-		  This differs from the default behavior of a job, where two statements
-		  with the name "GDG(+1)" refer to a single new GDS during the life of
-		  the job.
+	- All relative GDS names are resolved into their absolute form as an
+	  initial step before any copy operation.
+	  Two consecutive dcp calls that target a new GDS referenced by the name
+	  "GDG(+1)" will result in the creation of two consecutive generations.
+	  This differs from the default behavior of a job, where two statements
+	  with the name "GDG(+1)" refer to a single new GDS during the life of
+	  the job.
 
-		- Specifying a GDS, either as source or target, will not lock the
-		  generation data group (GDG) base. If concurrent processes are
-		  simultaneously adding or removing GDS from the group, the resulting
-		  GDG may be in an unexpected order.
+	- Specifying a GDS, either as source or target, will not lock the
+	  generation data group (GDG) base. If concurrent processes are
+	  simultaneously adding or removing GDS from the group, the resulting
+	  GDG may be in an unexpected order.
 
 	dcp supports copying a GDG to a new GDG. All active generations will be
 	copied in the same order as the source group. This feature does not lock
@@ -105,7 +104,6 @@ DESCRIPTION
 	GDG base is protected from concurrent modifications, in these cases the
 	system automatically locks a GDG base when referencing one generation by
 	its relative name.
-
 
 EXAMPLES
 
@@ -125,15 +123,14 @@ EXAMPLES
 
 		dcp IBMUSER.PROJ23.LISTING /tmp/my.listing
 
-	Copy the partitioned dataset member ZOAU.TEST.PDS(HELLO) and all of
-	its aliases to the partitioned dataset ZOAU.TEST.PDS2
-
-		dcp -i "ZOAU.TEST.PDS(HELLO)" ZOAU.TEST.PDS2
-
 	Copy the executable program GLZINPVT with all of its aliases to
 	/tmp/glzinpvt
 
 		dcp -XI "SYS1.LINKLIB(GLZINPVT)" /tmp/glzinpvt
+
+	Copy the partitioned dataset member ZOAU.TEST.PDS(HELLO) and all of its aliases to the partitioned dataset ZOAU.TEST.PDS2
+
+		dcp -i "ZOAU.TEST.PDS(HELLO)" ZOAU.TEST.PDS2
 
 	Copy the latest generation from the generation data group ZOAU.GDG.SRC
 	to a new generation of the group ZOAU.GDG.TGT
@@ -148,14 +145,12 @@ EXAMPLES
 EXIT VALUES
 
 	0
-		dcp completed without error.
-
-	5
-		dcp could not restore aliases of the target datset member.
+	  dcp completed without error.
 
 	non-zero
-		dcp failed. See error messages for details.
+	  dcp failed. See error messages for details.
 
 SEE ALSO
-	cp(1) drm(1) dtouch(1) dls(1) decho(1) ddiff(1) dgrep(1) dsed(1)
-	mrm(1) mls(1)
+
+	drm(1), dtouch(1), dls(1), decho(1),
+	ddiff(1), dgrep(1), dsed(1), mrm(1), mls(1)
